@@ -387,7 +387,7 @@ function AgendaEventRenderer() {
 		for (i=0; i<segCnt; i++) {
 			seg = segs[i];
 			if (eventElement = seg.element) {
-				eventElement[0].style.width = Math.max(0, seg.outerWidth - seg.hsides) + 'px';
+				eventElement[0].style.width = (Math.max(0, seg.outerWidth - seg.hsides)/slotSegmentContainer.width()*100) + '%';
 				height = Math.max(0, seg.outerHeight - seg.vsides);
 				eventElement[0].style.height = height + 'px';
 				event = seg.event;
@@ -411,7 +411,7 @@ function AgendaEventRenderer() {
         var skinCssAttr = (skinCss ? " style='" + skinCss + "'" : '');
         var defaultClasses = ['fc-event', 'fc-event-skin', 'fc-event-vert', 'fc-event-simplified'];
         var classes = classNames ? defaultClasses.concat(classNames) : defaultClasses;
-	    var html = " <div style='position:absolute;z-index:8; width: " + daycolWidth + "px ;top:" + seg.top + "px;left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "'"+
+	    var html = " <div data-event-id='" + event.id + "' style='position:absolute;z-index:8; width: " + daycolWidth + "px ;top:" + seg.top + "px;left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "'"+
 	    " class='" + classes.join(' ') + "'" + "></div>";
 	    return html;
 	}
@@ -422,6 +422,7 @@ function AgendaEventRenderer() {
 		var skinCss = getSkinCss(event, opt);
 		var skinCssAttr = (skinCss ? " style='" + skinCss + "'" : '');
 		var classes = ['fc-event', 'fc-event-skin', 'fc-event-vert'];
+		var slotSegmentContainer = getSlotSegmentContainer();
 		if (isEventDraggable(event)) {
 			classes.push('fc-event-draggable');
 		}
@@ -442,10 +443,11 @@ function AgendaEventRenderer() {
 		}else{
 			html += "div";
 		}
+
 		html +=
 			" data-event-id='" + event.id + "'" +
 			" class='" + classes.join(' ') + "'" +
-			" style='position:absolute;z-index:8;top:" + seg.top + "px;left:" + seg.left + "px;" + skinCss + "'" +
+			" style='position:absolute;z-index:8;top:" + seg.top + "px;left:" + (seg.left/slotSegmentContainer.width()*100) + "%;" + skinCss + "'" +
 			">" +
 			"<div class='fc-event-inner fc-event-skin'" + skinCssAttr + ">" +
 			"<div class='fc-event-head fc-event-skin'" + skinCssAttr + ">" +
@@ -527,11 +529,11 @@ function AgendaEventRenderer() {
 
 		timeline.css('top', Math.floor(container.height() * percents - 1) + 'px');
 
-		if (t.name == 'agendaWeek') { // week view, don't want the timeline to go the whole way across
+		if (t.name === 'agendaWeek') { // week view, don't want the timeline to go the whole way across
 			var daycol = $('.fc-today', t.element);
 			var left = daycol.position().left + 1;
 			var width = daycol.width();
-			timeline.css({ left: left + 'px', width: width + 'px' });
+			timeline.css({ left: (left / container.width() * 100) + '%', width: (width / container.width() * 100) + '%' });
 		}
 	}
 	
@@ -664,6 +666,7 @@ function AgendaEventRenderer() {
 		var colWidth = getColWidth();
 		var slotHeight = getSlotHeight();
 		var originalTopPosition, helperTimeElement;
+		var origWidth;
 		
 		eventElement.draggable({
 			helper: 'clone',
@@ -679,6 +682,9 @@ function AgendaEventRenderer() {
 				trigger('eventDragStart', eventElement, event, ev, ui);
 				hideEvents(event, eventElement);
 				origPosition = eventElement.position();
+				// As the original eventElement has a width in percentage in 'agendaWeek' we get the pixel width and set that on the helper (helper is in body and will become percentage of body otherwise)
+				origWidth = eventElement.width();
+				ui.helper.width(origWidth);
 				eventElement.css('display', 'none');
 				originalTopPosition = ev.pageY;
 				helperTimeElement = ui.helper.find('div.fc-event-time');

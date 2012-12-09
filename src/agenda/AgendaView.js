@@ -227,7 +227,7 @@ function AgendaView(element, calendar, viewName) {
 		if (opt('allDaySlot')) {
 		
 			daySegmentContainer =
-				$("<div style='position:absolute;z-index:8;top:0;left:0'/>")
+				$("<div style='position:absolute;z-index:8;top:0;left:0;right:0'/>")
 					.appendTo(slotLayer);
 		
 			s =
@@ -269,7 +269,7 @@ function AgendaView(element, calendar, viewName) {
 				.appendTo(slotScroller);
 				
 		slotSegmentContainer =
-			$("<div style='position:absolute;z-index:8;top:0;left:0'/>")
+			$("<div style='position:absolute;z-index:8;top:0;left:0;right:0'/>")
 				.appendTo(slotContent);
 		
 		s =
@@ -364,9 +364,22 @@ function AgendaView(element, calendar, viewName) {
 	
 	
 	function setWidth(width) {
+		if (this.name === 'agendaWeek') {
+			viewWidth = width;
+			gutterWidth = 0;
+			colWidth = width * 0.13;
+			axisWidth = width * 0.07;
+
+			colContentPositions.clear();
+
+			// setting percentages
+			setOuterWidth(dayHeadCells, 13, null, true);
+			setOuterWidth(axisFirstCells, 7, null, true);
+			return;
+		}
+
 		viewWidth = width;
 		colContentPositions.clear();
-		
 		axisWidth = 0;
 		setOuterWidth(
 			axisFirstCells

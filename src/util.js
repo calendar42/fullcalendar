@@ -139,10 +139,14 @@ function lazySegBind(container, segs, bindHandlers) {
 -----------------------------------------------------------------------------*/
 
 
-function setOuterWidth(element, width, includeMargins) {
+function setOuterWidth(element, width, includeMargins, percentages) {
 	for (var i=0, e; i<element.length; i++) {
 		e = $(element[i]);
-		e.width(Math.max(0, width - hsides(e, includeMargins)));
+		if (percentages) {
+			e.width(width+'%');
+		} else {
+			e.width(Math.max(0, width - hsides(e, includeMargins)));
+		}
 	}
 }
 

@@ -110,7 +110,7 @@ function DayEventRenderer() {
     			"<div" +
 				" data-event-id='" + event.id + "'" +
     			" class='" + classes.join(' ') + "'" +
-    			" style='position:absolute;z-index:8;height:2px;left:"+left+"px;width:" + seg.outerWidth + "px;" + skinCss + "'" +
+    			" style='position:absolute;z-index:8;height:2px;left:"+(left/maxLeft*100)+"%;width:" + (seg.outerWidth/maxLeft*100) + "%;" + skinCss + "'" +
     			">" +
     			"<div" +
     			" class='fc-event-inner fc-event-skin'" +
@@ -306,7 +306,8 @@ function DayEventRenderer() {
 			html +=
 				" data-event-id='" + event.id + "'" +
 				" class='" + classes.join(' ') + "'" +
-				" style='position:absolute;z-index:8;left:"+left+"px;" + skinCss + "'" +
+				// " style='position:absolute;z-index:8;left:"+(left/maxLeft*100)+"%;" + skinCss + "'" +
+				" style='position:absolute;z-index:8;left:"+(leftCol*(13)+7+0.25)+"%;" + skinCss + "'" + // opt.colPercWidt + opt.axisPercWidth + 0.25 
 				">" +
 				"<div" +
 				" class='fc-event-inner fc-event-skin'" +
@@ -438,11 +439,17 @@ function DayEventRenderer() {
 		var segCnt = segs.length;
 		var seg;
 		var element;
+		
 		for (i=0; i<segCnt; i++) {
 			seg = segs[i];
 			element = seg.element;
 			if (element) {
-				element[0].style.width = Math.max(0, seg.outerWidth - seg.hsides) + 'px';
+				if (t.name === 'agendaWeek') {
+					// element[0].style.width = (seg.outerWidth - seg.hsides) / t.element.width() * 100 + '%';
+					element[0].style.width = (seg.endCol - seg.startCol) * (13 - 1 - 0.25) + '%'; // opt.colPercWidt - opt.axisPercWidth - 0.25
+				} else {
+					element[0].style.width = Math.max(0, seg.outerWidth - seg.hsides) + 'px';
+				}
 			}
 		}
 	}
