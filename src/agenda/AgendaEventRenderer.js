@@ -226,6 +226,7 @@ function AgendaEventRenderer() {
     function renderSlotSegsSimplified (segs, classNames) {
         var i, segCnt=segs.length, seg,
     		event,
+    		eventElement,
     		top, bottom,
     		colI, levelI, forward,
     		leftmost,
@@ -259,7 +260,8 @@ function AgendaEventRenderer() {
               seg.left = leftmost;
               html += slotSegSimplifiedHtml(event, seg, classNames);
           }
-          slotSegmentContainer.append(html);
+          eventElement = $(html).appendTo(slotSegmentContainer);
+          bindSlotSeg(event, eventElement, seg);
           return;
     }
 	
@@ -407,13 +409,16 @@ function AgendaEventRenderer() {
 	function slotSegSimplifiedHtml (event, seg, classNames) {
         var skinCss = getSkinCss(event, opt);
         var daycol = $('.fc-col0:first', t.element);
-        var daycolWidth = daycol.width() - 10;
+        var daycolWidth = daycol.width() - 10; // TODO: This should not always be 10 (like in the day view), should be related to seg.hsides (which is not calculated for the simplified segs atm)
         var skinCssAttr = (skinCss ? " style='" + skinCss + "'" : '');
         var defaultClasses = ['fc-event', 'fc-event-skin', 'fc-event-vert', 'fc-event-simplified'];
         var classes = classNames ? defaultClasses.concat(classNames) : defaultClasses;
-	    var html = " <div data-event-id='" + event.id + "' style='position:absolute;z-index:8; width: " + daycolWidth + "px ;top:" + seg.top + "px;left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "'"+
-	    " class='" + classes.join(' ') + "'" + "></div>";
-	    return html;
+
+		var html = "<div data-event-id='" + event.id + "' style='position:absolute;z-index:8; width: " + daycolWidth + "px ;top:" + seg.top + "px;left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "' class='" + classes.join(' ') + "'>"+
+		(event.title ? htmlEscape(event.title) : "") +
+		" </div>";
+		
+		return html;
 	}
 	
 	function slotSegHtml(event, seg) {

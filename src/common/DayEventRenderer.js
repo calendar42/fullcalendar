@@ -46,7 +46,7 @@ function DayEventRenderer() {
 		segmentContainer.append(daySegSimplifiedHTML(segs), classNames);
 	}
 	
-    function daySegSimplifiedHTML(segs) {
+    function daySegSimplifiedHTML(segs, classNames) {
     	var rtl = opt('isRTL');
     	var i;
     	var segCnt=segs.length;
