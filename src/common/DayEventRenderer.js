@@ -35,6 +35,7 @@ function DayEventRenderer() {
 	var renderDayOverlay = t.renderDayOverlay;
 	var clearOverlays = t.clearOverlays;
 	var clearSelection = t.clearSelection;
+	var alwaysAllowExternalDrag = true; // TODO: Make globally accessible
 	
 	
 	
@@ -263,8 +264,11 @@ function DayEventRenderer() {
 			seg = segs[i];
 			event = seg.event;
 			classes = ['fc-event', 'fc-event-skin', 'fc-event-hori'];
-			if (isEventDraggable(event)) {
+			if (isEventDraggable(event) || alwaysAllowExternalDrag) {
 				classes.push('fc-event-draggable');
+			}
+			if (alwaysAllowExternalDrag) {
+				classes.push('fc-event-draggable-external-only');
 			}
 			if (rtl) {
                 

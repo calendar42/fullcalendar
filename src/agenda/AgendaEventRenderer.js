@@ -53,6 +53,7 @@ function AgendaEventRenderer() {
 	var formatDates = calendar.formatDates;
 	var timeLineInterval;
 	var isDragging;
+	var alwaysAllowExternalDrag = true; // TODO: Make globally accessible
 	
 	
 	// Here we only update the even in the dom
@@ -70,6 +71,9 @@ function AgendaEventRenderer() {
 			var classes = ['fc-event', 'fc-event-skin', 'fc-event-vert'];
 			if (isEventDraggable(event)) {
 				classes.push('fc-event-draggable');
+			} else if (alwaysAllowExternalDrag) {
+				classes.push('fc-event-draggable');
+				classes.push('fc-event-draggable-external-only');
 			}
 			classes = classes.concat(event.className);
 			if (event.source) {
@@ -437,6 +441,9 @@ function AgendaEventRenderer() {
 		var mainDivSkinCss = '';
 		if (isEventDraggable(event)) {
 			classes.push('fc-event-draggable');
+		} else if (alwaysAllowExternalDrag) {
+			classes.push('fc-event-draggable');
+			classes.push('fc-event-draggable-external-only');
 		}
 		if (secondaryBorderColor) {
 			mainDivSkinCss = 'border-left-color:' + borderColor + '; border-top-color:' + borderColor + '; border-right-color:' + secondaryBorderColor + '; border-bottom-color:' + secondaryBorderColor + '; background-color: ' + secondaryBorderColor + ';';
@@ -494,6 +501,8 @@ function AgendaEventRenderer() {
 	function bindDaySeg(event, eventElement, seg) {
 		if (isEventDraggable(event)) {
 			draggableDayEvent(event, eventElement, seg.isStart);
+		} else if (alwaysAllowExternalDrag) {
+			draggableDayEvent(event, eventElement, seg.isStart, true);
 		}
 		if (seg.isEnd && isEventResizable(event)) {
 			resizableDayEvent(event, eventElement, seg);
@@ -507,6 +516,8 @@ function AgendaEventRenderer() {
 		var timeElement = eventElement.find('div.fc-event-time');
 		if (isEventDraggable(event)) {
 			draggableSlotEvent(event, eventElement, timeElement);
+		} else if (alwaysAllowExternalDrag) {
+			draggableSlotEvent(event, eventElement, timeElement, true);
 		}
 		if (seg.isEnd && isEventResizable(event)) {
 			resizableSlotEvent(event, eventElement, timeElement);
@@ -560,7 +571,7 @@ function AgendaEventRenderer() {
 	
 	// when event starts out FULL-DAY
 
-	function draggableDayEvent(event, eventElement, isStart) {
+	function draggableDayEvent(event, eventElement, isStart, externalOnly) {
 		var origWidth;
 		var origHeight;
 		var revert;
@@ -590,7 +601,7 @@ function AgendaEventRenderer() {
 				helperElement.css('height', origHeight);
 				hoverListener.start(function(cell, origCell, rowDelta, colDelta) {
 					clearOverlays();
-					if (cell) {
+					if (cell || externalOnly) {
 						//setOverflowHidden(true);
 						revert = false;
 						dayDelta = colDelta * dis;
@@ -633,7 +644,7 @@ function AgendaEventRenderer() {
 				hoverListener.stop();
 				clearOverlays();
 
-				if (revert) {
+				if (revert || externalOnly) {
 					// hasn't moved or is out of bounds (draggable has already reverted)
 					resetElement();
 					eventElement.css('filter', ''); // clear IE opacity side-effects
@@ -669,7 +680,7 @@ function AgendaEventRenderer() {
 	
 	// when event starts out IN TIMESLOTS
 	
-	function draggableSlotEvent(event, eventElement, timeElement) {
+	function draggableSlotEvent(event, eventElement, timeElement, externalOnly) {
 		var origPosition;
 		var allDay=false;
 		var outsideGrid = false;
@@ -704,7 +715,7 @@ function AgendaEventRenderer() {
 				hoverListener.start(function(cell, origCell, rowDelta, colDelta) {
 					eventElement.draggable('option', 'revert', !cell);
 					clearOverlays();
-					if (cell) {
+					if (cell && !externalOnly) {
 						dayDelta = colDelta * dis;
 						if (opt('allDaySlot') && !cell.row) {
 							// over full days
@@ -730,6 +741,7 @@ function AgendaEventRenderer() {
 				}, ev, 'drag');
 			},
 			drag: function(ev, ui) {
+				if (externalOnly) { return; }
 				minuteDelta = Math.round((ev.pageY - originalTopPosition) / slotHeight) * opt('slotMinutes');
 				if (minuteDelta != prevMinuteDelta) {
 					if (!allDay) {
@@ -741,7 +753,7 @@ function AgendaEventRenderer() {
 			stop: function(ev, ui) {
 				var cell = hoverListener.stop();
 				clearOverlays();
-				if (cell && (dayDelta || minuteDelta || allDay)) {
+				if (!externalOnly && cell && (dayDelta || minuteDelta || allDay)) {
 					// changed!
 					eventDrop(this, event, dayDelta, allDay ? 0 : minuteDelta, allDay, ev, ui);
 				}else{

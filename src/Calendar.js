@@ -501,6 +501,8 @@ function Calendar(element, options, eventSources) {
 	/* External Dragging
 	------------------------------------------------------------------------*/
 	
+	// Extend to also enable dropping ready events
+
 	if (options.droppable) {
 		$(document)
 			.bind('dragstart', function(ev, ui) {

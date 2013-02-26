@@ -1,0 +1,131 @@
+diff --git a/src/agenda/AgendaEventRenderer.js b/src/agenda/AgendaEventRenderer.js
+index 53acaa8..13bfd98 100644
+--- a/src/agenda/AgendaEventRenderer.js
++++ b/src/agenda/AgendaEventRenderer.js
+@@ -52,6 +52,7 @@ function AgendaEventRenderer() {
+ 	var formatDate = calendar.formatDate;
+ 	var formatDates = calendar.formatDates;
+ 	var timeLineInterval;
++	var getSelectionSlotRatio = t.getSelectionSlotRatio; // read selection slot ratio
+ 	
+ 	
+ 	// Here we only update the even in the dom
+@@ -528,7 +529,7 @@ function AgendaEventRenderer() {
+ 		var dis = opt('isRTL') ? -1 : 1;
+ 		var hoverListener = getHoverListener();
+ 		var colWidth = getColWidth();
+-		var slotHeight = getSlotHeight();
++		var slotHeight = getSlotHeight() / getSelectionSlotRatio();    // calculate height depending on selection slot ratio
+ 		var minMinute = getMinMinute();
+ 		eventElement.draggable({
+ 			zIndex: 9,
+@@ -665,7 +666,7 @@ function AgendaEventRenderer() {
+ 				}, ev, 'drag');
+ 			},
+ 			drag: function(ev, ui) {
+-				minuteDelta = Math.round((ui.position.top - origPosition.top) / slotHeight) * opt('slotMinutes');
++				minuteDelta = Math.round((ui.position.top - origPosition.top) / slotHeight) * opt('selectionSlotMinutes');
+ 				if (minuteDelta != prevMinuteDelta) {
+ 					if (!allDay) {
+ 						updateTimeText(minuteDelta);
+@@ -716,7 +717,7 @@ function AgendaEventRenderer() {
+ 	
+ 	function resizableSlotEvent(event, eventElement, timeElement) {
+ 		var slotDelta, prevSlotDelta;
+-		var slotHeight = getSlotHeight();
++		var slotHeight = getSlotHeight() / getSelectionSlotRatio();    // calculate height depending on selection slot ratio
+ 		eventElement.resizable({
+ 			handles: {
+ 				s: 'div.ui-resizable-s'
+@@ -725,7 +726,7 @@ function AgendaEventRenderer() {
+ 			start: function(ev, ui) {
+ 				slotDelta = prevSlotDelta = 0;
+ 				hideEvents(event, eventElement);
+-				eventElement.css('z-index', 9);
++				eventElement.css('z-index', 10);
+ 				trigger('eventResizeStart', this, event, ev, ui);
+ 			},
+ 			resize: function(ev, ui) {
+@@ -736,7 +737,7 @@ function AgendaEventRenderer() {
+ 						formatDates(
+ 							event.start,
+ 							(!slotDelta && !event.end) ? null : // no change, so don't display time range
+-								addMinutes(eventEnd(event), opt('slotMinutes')*slotDelta),
++								addMinutes(eventEnd(event), opt('selectionSlotMinutes')*slotDelta),
+ 							opt('timeFormat')
+ 						)
+ 					);
+diff --git a/src/agenda/AgendaView.js b/src/agenda/AgendaView.js
+index 9695b10..45d69c1 100644
+--- a/src/agenda/AgendaView.js
++++ b/src/agenda/AgendaView.js
+@@ -4,6 +4,7 @@ setDefaults({
+ 	allDayText: 'all-day',
+ 	firstHour: 6,
+ 	slotMinutes: 30,
++	selectionSlotMinutes: 30, // Set default selection slot size to default slot size
+ 	defaultEventMinutes: 120,
+ 	axisFormat: 'h(:mm)tt',
+ 	timeFormat: {
+@@ -59,7 +60,7 @@ function AgendaView(element, calendar, viewName) {
+ 	t.reportDayClick = reportDayClick; // selection mousedown hack
+ 	t.dragStart = dragStart;
+ 	t.dragStop = dragStop;
+-	
++	t.getSelectionSlotRatio = function() { return selectionSlotRatio }; // make selectionSlotRatio readable
+ 	
+ 	// imports
+ 	View.call(t, element, calendar, viewName);
+@@ -108,6 +109,8 @@ function AgendaView(element, calendar, viewName) {
+ 	var colWidth;
+ 	var gutterWidth;
+ 	var slotHeight; // TODO: what if slotHeight changes? (see issue 650)
++	var selectionSlotHeight;  // holds the hight of a selection slot in px
++	var selectionSlotRatio;    // holds the relationship between standard slot size and selection slot size
+ 	var savedScrollTop;
+ 	
+ 	var colCnt;
+@@ -354,8 +357,9 @@ function AgendaView(element, calendar, viewName) {
+ 		
+ 		slotScroller.height(bodyHeight - allDayHeight - 1);
+ 		
+-		slotHeight = slotTableFirstInner.height() + 1; // +1 for border
+-		
++		slotHeight = slotTableFirstInner.height() + 1; // +1 for border C42???
++		selectionSlotRatio = opt('slotMinutes') / opt('selectionSlotMinutes');
++		selectionSlotHeight = slotHeight / selectionSlotRatio;
+ 		if (dateChanged) {
+ 			resetScroll();
+ 		}
+@@ -547,8 +551,8 @@ function AgendaView(element, calendar, viewName) {
+ 		}
+ 		for (var i=0; i<slotCnt; i++) {
+ 			rows.push([
+-				constrain(slotTableTop + slotHeight*i),
+-				constrain(slotTableTop + slotHeight*(i+1))
++				constrain(slotTableTop + selectionSlotHeight*i),
++				constrain(slotTableTop + selectionSlotHeight*(i+1))
+ 			]);
+ 		}
+ 	});
+@@ -589,7 +593,7 @@ function AgendaView(element, calendar, viewName) {
+ 			slotIndex--;
+ 		}
+ 		if (slotIndex >= 0) {
+-			addMinutes(d, minMinute + slotIndex * opt('slotMinutes'));
++			addMinutes(d, minMinute + slotIndex * opt('selectionSlotMinutes'));
+ 		}
+ 		return d;
+ 	}
+@@ -752,9 +756,9 @@ function AgendaView(element, calendar, viewName) {
+ 					var d2 = cellDate(cell);
+ 					dates = [
+ 						d1,
+-						addMinutes(cloneDate(d1), opt('slotMinutes')),
++						addMinutes(cloneDate(d1), opt('selectionSlotMinutes')), // calculate minutes depending on selection slot minutes
+ 						d2,
+-						addMinutes(cloneDate(d2), opt('slotMinutes'))
++						addMinutes(cloneDate(d2), opt('selectionSlotMinutes'))
+ 					].sort(cmp);
+ 					renderSlotSelection(dates[0], dates[3]);
+ 				}else{
