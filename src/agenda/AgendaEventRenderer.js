@@ -671,7 +671,9 @@ function AgendaEventRenderer() {
 		var colWidth = getColWidth();
 		var slotHeight = getSlotHeight();
 		var originalTopPosition, helperTimeElement;
-		var origWidth;
+		var pixelWidth;
+		var percentageWidth;
+		var percentageLeft;
 		
 		eventElement.draggable({
 			helper: 'clone',
@@ -687,9 +689,12 @@ function AgendaEventRenderer() {
 				trigger('eventDragStart', eventElement, event, ev, ui);
 				hideEvents(event, eventElement);
 				origPosition = eventElement.position();
+				// save the percentage width and left to put back later on
+				percentageWidth = ui.helper[0].style.width;
+				percentageLeft = ui.helper[0].style.left;
 				// As the original eventElement has a width in percentage in 'agendaWeek' we get the pixel width and set that on the helper (helper is in body and will become percentage of body otherwise)
-				origWidth = eventElement.width();
-				ui.helper.width(origWidth);
+				pixelWidth = eventElement.width();
+				ui.helper.width(pixelWidth);
 				eventElement.css('display', 'none');
 				originalTopPosition = ev.pageY;
 				helperTimeElement = ui.helper.find('div.fc-event-time');
@@ -745,6 +750,8 @@ function AgendaEventRenderer() {
 					updateTimeText(0);
 					showEvents(event, eventElement);
 					eventElement.css('display', ''); // show() was causing display=inline
+					eventElement.css('width', percentageWidth); // put back the original width on the event again
+					eventElement.css('left', percentageLeft);
 				}
 				// moved the trigger after it is done, so all the logic of fullcalendar is done before we apply our own
 				trigger('eventDragStop', eventElement, event, ev, ui);

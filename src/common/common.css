@@ -148,6 +148,7 @@
 	font-size: .85em;
 	cursor: default;
 	opacity: 1;
+	box-sizing:border-box;
 	}
 	
 a.fc-event,

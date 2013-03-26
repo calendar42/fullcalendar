@@ -365,16 +365,19 @@ function AgendaView(element, calendar, viewName) {
 	
 	function setWidth(width) {
 		if (this.name === 'agendaWeek') {
+			var axisWidthPercentage = 7.25,
+				dayWidthPercentage = 13.25;
+
 			viewWidth = width;
 			gutterWidth = 0;
-			colWidth = width * 0.13;
-			axisWidth = width * 0.07;
+			colWidth = width * dayWidthPercentage / 100;
+			axisWidth = width * axisWidthPercentage / 100;
 
 			colContentPositions.clear();
 
 			// setting percentages
-			setOuterWidth(dayHeadCells, 13, null, true);
-			setOuterWidth(axisFirstCells, 7, null, true);
+			setOuterWidth(dayHeadCells, dayWidthPercentage, null, true);
+			setOuterWidth(axisFirstCells, axisWidthPercentage, null, true);
 			return;
 		}
 

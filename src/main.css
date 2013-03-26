@@ -30,6 +30,7 @@ html .fc,
 .fc th {
 	padding: 0;
 	vertical-align: top;
+	box-sizing: border-box;
 	}
 
 
