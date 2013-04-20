@@ -1,0 +1,41 @@
+diff --git a/src/agenda/AgendaEventRenderer.js b/src/agenda/AgendaEventRenderer.js
+index 3087f5e..4935313 100644
+--- a/src/agenda/AgendaEventRenderer.js
++++ b/src/agenda/AgendaEventRenderer.js
+@@ -318,9 +318,15 @@ function AgendaEventRenderer() {
+ 			leftmost = colContentLeft(colI*dis + dit);
+ 			availWidth = colContentRight(colI*dis + dit) - leftmost;
+ 			availWidth = Math.min(availWidth-6, availWidth*.95); // TODO: move this to CSS
++			var preLevelWidth = 0;
+ 			if (levelI) {
+ 				// indented and thin
+-				outerWidth = availWidth / (levelI + forward + 1);
++				// for (var l=0; l<levelI; i--)
++				for (var l = levelI; l > 0; l--) {
++					preLevelWidth += segs[i-l].outerWidth;
++				};
++				outerWidth = availWidth - preLevelWidth;
++				// outerWidth = availWidth / (levelI + forward + 1);
+ 			}else{
+ 				if (forward) {
+ 					if (overlapping) {	// moderately wide, aligned left still
+@@ -334,12 +340,18 @@ function AgendaEventRenderer() {
+ 				}
+ 			}
+ 			left = leftmost +                                  // leftmost possible
+-				(availWidth / (levelI + forward + 1) * levelI) // indentation
++				// (availWidth / (levelI + forward + 1) * levelI) // indentation
++				preLevelWidth
+ 				* dis + (rtl ? availWidth - outerWidth : 0);   // rtl
+ 			seg.top = top;
+ 			seg.left = left;
+ 			seg.outerWidth = outerWidth - (overlapping ? 0 : 1);
+ 			seg.outerHeight = bottom - top;
++			// improve naming
++			if (event.className.indexOf('not-attending') > -1) {
++				seg.left = leftmost;
++				seg.outerWidth = 14;
++			}
+ 			html += slotSegHtml(event, seg);
+ 		}
+ 		slotSegmentContainer[0].innerHTML = html; // faster than html()

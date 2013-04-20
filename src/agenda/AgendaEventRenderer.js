@@ -32,6 +32,7 @@ function AgendaEventRenderer() {
 	var getMaxMinute = t.getMaxMinute;
 	var getMinMinute = t.getMinMinute;
 	var timePosition = t.timePosition;
+	var timePositionBottom = t.timePositionBottom;
 	var colContentLeft = t.colContentLeft;
 	var colContentRight = t.colContentRight;
 	var renderDaySegs = t.renderDaySegs;
@@ -248,24 +249,29 @@ function AgendaEventRenderer() {
     		dis = 1;
     		dit = 0;
     	}
-    	
         
           for (i=0; i<segCnt; i++) {
               seg = segs[i];
               event = seg.event;
-              seg.top = timePosition(seg.start, seg.start);
-              seg.bottom = timePosition(seg.start, seg.end);
+              if (event.fromBottom) {
+              	seg.top = timePositionBottom(seg.start, seg.start);
+              	seg.bottom = timePositionBottom(seg.start, seg.end);	
+              } else {
+              	seg.top = timePosition(seg.start, seg.start);
+              	seg.bottom = timePosition(seg.start, seg.end);
+              }
               colI = seg.col;
               levelI = seg.level;
               forward = seg.forward || 0;
               leftmost = colContentLeft(colI*dis + dit);
               seg.outerWidth = 2;
-              seg.outerHeight = seg.bottom - seg.top;
+              seg.outerHeight = Math.abs(seg.bottom - seg.top);
               seg.left = leftmost;
               html += slotSegSimplifiedHtml(event, seg, classNames);
           }
           if (event) {
-	          eventElement = $(html).appendTo(slotSegmentContainer);
+	          eventElement = $(html).css('display', 'none').appendTo(slotSegmentContainer);
+	          eventElement.slideDown("fast");
 	          bindSlotSeg(event, eventElement, seg);
 	      }
           return;
@@ -419,7 +425,8 @@ function AgendaEventRenderer() {
         var skinCssAttr = (skinCss ? " style='" + skinCss + "'" : '');
         var defaultClasses = ['fc-event', 'fc-event-skin', 'fc-event-vert', 'fc-event-simplified'];
         var classes = classNames ? defaultClasses.concat(classNames) : defaultClasses;
-	    var html = "<div data-event-id='" + event.id + "' style='position:absolute;z-index:8; width: " + daycolWidth + "px ;top:" + seg.top + "px;left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "' class='" + classes.join(' ') + "'>"+
+        var verticalPosition = event.fromBottom ? "bottom:" + (seg.bottom) + "px;" : "top:" + seg.top + "px;";
+	    var html = "<div data-event-id='" + event.id + "' style='position:absolute;z-index:8; width: " + daycolWidth + "px ;" + verticalPosition + "left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "' class='" + classes.join(' ') + "'>"+
 	    (event.title ? htmlEscape(event.title) : "") +
 	    " </div>";
 	    

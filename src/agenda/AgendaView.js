@@ -33,6 +33,7 @@ function AgendaView(element, calendar, viewName) {
 	t.afterShow = afterShow;
 	t.defaultEventEnd = defaultEventEnd;
 	t.timePosition = timePosition;
+	t.timePositionBottom = timePositionBottom;
 	t.dayOfWeekCol = dayOfWeekCol;
 	t.dateCell = dateCell;
 	t.cellDate = cellDate;
@@ -269,7 +270,7 @@ function AgendaView(element, calendar, viewName) {
 				.appendTo(slotScroller);
 				
 		slotSegmentContainer =
-			$("<div style='position:absolute;z-index:8;top:0;left:0'/>")
+			$("<div style='z-index:8;top:0;left:0;height:100%;width:100%'/>")
 				.appendTo(slotContent);
 		
 		s =
@@ -634,6 +635,27 @@ function AgendaView(element, calendar, viewName) {
 		}
 		return Math.max(0, Math.round(
 			slotTop - 1 + slotHeight * ((minutes % slotMinutes) / slotMinutes)
+		));
+	}
+
+	// get the Y coordinate of the given time on the given day (both Date objects)
+	function timePositionBottom(day, time) { // both date objects. day holds 00:00 of current day
+		day = cloneDate(day, true);
+		if (time < addMinutes(cloneDate(day), minMinute)) {
+			return slotTable.height();
+		}
+		if (time >= addMinutes(cloneDate(day), maxMinute)) {
+			return 0;
+		}
+		var slotMinutes = opt('slotMinutes'),
+			minutes = time.getHours()*60 + time.getMinutes() - minMinute,
+			slotI = Math.floor(minutes / slotMinutes),
+			slotTop = slotTopCache[slotI];
+		if (slotTop === undefined) {
+			slotTop = slotTopCache[slotI] = slotTable.find('tr:eq(' + slotI + ') td div')[0].offsetTop; //.position().top; // need this optimization???
+		}
+		return Math.max(0, Math.round(
+			slotTable.height() - (slotTop - 1 + slotHeight * ((minutes % slotMinutes) / slotMinutes))
 		));
 	}
 	
