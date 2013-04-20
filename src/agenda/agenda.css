@@ -25,6 +25,7 @@ th {
 	white-space: nowrap;
 	width: auto;
 	padding: 2px 4px;
+	font-weight: normal;
 }
 
 .fc-agenda-days th {
