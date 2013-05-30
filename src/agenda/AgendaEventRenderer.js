@@ -241,7 +241,8 @@ function AgendaEventRenderer() {
     		slotSegmentContainer = getSlotSegmentContainer(),
     		rtl, dis, dit,
     		colCnt = getColCnt(),
-    		overlapping = colCnt > 1;
+    		overlapping = colCnt > 1,
+    		existing = slotSegmentContainer.find('[data-event-id="'+segs[0].event.id+'"]');
     	if (rtl = opt('isRTL')) {
     		dis = -1;
     		dit = colCnt - 1;
@@ -270,9 +271,13 @@ function AgendaEventRenderer() {
               html += slotSegSimplifiedHtml(event, seg, classNames);
           }
           if (event) {
-	          eventElement = $(html).css('display', 'none').appendTo(slotSegmentContainer);
-	          eventElement.slideDown("fast");
-	          bindSlotSeg(event, eventElement, seg);
+          	if (existing.length === 0) {
+				eventElement = $(html).css('display', 'none').appendTo(slotSegmentContainer);
+				eventElement.slideDown("fast");
+          	} else {
+          		eventElement = $(html).replaceAll(existing);
+          	}
+          	bindSlotSeg(event, eventElement, seg);
 	      }
           return;
     }
