@@ -242,7 +242,8 @@ function AgendaEventRenderer() {
     		rtl, dis, dit,
     		colCnt = getColCnt(),
     		overlapping = colCnt > 1,
-    		existing = slotSegmentContainer.find('[data-event-id="'+segs[0].event.id+'"]');
+    		existing;
+
     	if (rtl = opt('isRTL')) {
     		dis = -1;
     		dit = colCnt - 1;
@@ -271,6 +272,7 @@ function AgendaEventRenderer() {
               html += slotSegSimplifiedHtml(event, seg, classNames);
           }
           if (event) {
+          	existing = slotSegmentContainer.find('[data-event-id="'+event.id+'"]');
           	if (existing.length === 0) {
 				eventElement = $(html).css('display', 'none').appendTo(slotSegmentContainer);
 				eventElement.slideDown("fast");
