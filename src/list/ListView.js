@@ -42,7 +42,7 @@ function ListEventRenderer() {
 		reportEvents(events);
 		renderSegs(compileSegs(events), modifiedEventId);
 	}
-	
+
 	function compileSegs(events) {
 		var segs = [];
 		var colFormat = opt('titleFormat', 'day');
@@ -51,59 +51,74 @@ function ListEventRenderer() {
 		var event, i, dd, wd, md, seg, segHash, curSegHash, segDate, curSeg = -1;
 		var today = clearTime(new Date());
 		var weekstart = addDays(cloneDate(today), -((today.getDay() - firstDay + 7) % 7));
-		
-		for (i=0; i < events.length; i++) {
-			event = events[i];
-			
-			// skip events out of range
-			if ((event.end || event.start) < t.start || event.start > t.visEnd)
-				continue;
-			
+		var viewstart = addDays(cloneDate(t.start), -((t.start.getDay() - firstDay + 7) % 7));
+
+		for (i=0; i < opt('listRange'); i++) {
 			// define sections of this event
 			// create smart sections such as today, tomorrow, this week, next week, next month, ect.
-			segDate = cloneDate(event.start < t.start && event.end > t.start ? t.start : event.start, true);
+			segDate = addDays(cloneDate(viewstart), i);
 			dd = dayDiff(segDate, today);
 			wd = Math.floor(dayDiff(segDate, weekstart) / 7);
 			md = segDate.getMonth() + ((segDate.getYear() - today.getYear()) * 12) - today.getMonth();
-			
+
 			// build section title
 			if (segmode == 'smart') {
 				if (dd < 0) {
 					segHash = opt('listTexts', 'past');
-				} else if (dd == 0) {
+				} else if (dd === 0) {
 					segHash = opt('listTexts', 'today');
-				} else if (dd == 1) {
+				} else if (dd === 1) {
 					segHash = opt('listTexts', 'tomorrow');
-				} else if (wd == 0) {
+				} else if (wd === 0) {
 					segHash = opt('listTexts', 'thisWeek');
-				} else if (wd == 1) {
+				} else if (wd === 1) {
 					segHash = opt('listTexts', 'nextWeek');
-				} else if (md == 0) {
+				} else if (md === 0) {
 					segHash = opt('listTexts', 'thisMonth');
-				} else if (md == 1) {
+				} else if (md === 1) {
 					segHash = opt('listTexts', 'nextMonth');
 				} else if (md > 1) {
 					segHash = opt('listTexts', 'future');
 				}
-			} else if (segmode == 'month') {
+			} else if (segmode === 'month') {
 				segHash = formatDate(segDate, 'MMMM yyyy');
-			} else if (segmode == 'week') {
+			} else if (segmode === 'week') {
 				segHash = opt('listTexts', 'week') + formatDate(segDate, ' W');
-			} else if (segmode == 'day') {
+			} else if (segmode == 'smart-day') {
+				if (dd === -1) {
+					segHash = opt('listTexts', 'yesterday');
+				} else if (dd === 0) {
+					segHash = opt('listTexts', 'today');
+				} else if (dd === 1) {
+					segHash = opt('listTexts', 'tomorrow');
+				} else {
+					segHash = formatDate(segDate, colFormat);
+				}
+			} else if (segmode === 'day') {
 				segHash = formatDate(segDate, colFormat);
 			} else {
 				segHash = '';
 			}
-			
-			// start new segment
-			if (segHash != curSegHash) {
-				segs[++curSeg] = { events: [], start: segDate, title: segHash, daydiff: dd, weekdiff: wd, monthdiff: md };
-				curSegHash = segHash;
-			}
-			
-			segs[curSeg].events.push(event);
+
+			segs[i] = { events: [], start: segDate, title: segHash, daydiff: dd, weekdiff: wd, monthdiff: md };
 		}
-		
+
+		for (i=0; i < events.length; i++) {
+			event = events[i];
+
+			// skip events out of range
+			if ((event.end || event.start) < t.start || event.start > t.visEnd) {
+				continue;
+			}
+
+			// define sections of this event
+			// create smart sections such as today, tomorrow, this week, next week, next month, ect.
+			segDate = cloneDate(event.start < t.start && event.end > t.start ? t.start : event.start, true);
+			// Get the index of the event compared to the week start
+			dd = dayDiff(segDate, viewstart);
+
+			segs[dd].events.push(event);
+		}
 		return segs;
 	}
 
@@ -121,6 +136,10 @@ function ListEventRenderer() {
 		for (j=0; j < segs.length; j++) {
 			seg = segs[j];
 			
+			if (!opt('listShowEmptyDays') && seg.events.length === 0) {
+				continue;
+			}
+
 			if (seg.title) {
 				$('<div class="fc-list-header ' + headerClass + '">' + htmlEscape(seg.title) + '</div>').appendTo(getListContainer());
 			}
@@ -237,7 +256,7 @@ function ListEventRenderer() {
 			ev.stopPropagation();
 		});
 	}
-	
+
 }
 
 
@@ -258,7 +277,7 @@ function ListView(element, calendar) {
 	ListEventRenderer.call(t);
 	var opt = t.opt;
 	var trigger = t.trigger;
-  var clearEvents = t.clearEvents;
+    var clearEvents = t.clearEvents;
 	var reportEventClear = t.reportEventClear;
 	var formatDates = calendar.formatDates;
 	var formatDate = calendar.formatDate;
@@ -266,15 +285,15 @@ function ListView(element, calendar) {
 	// overrides
 	t.setWidth = setWidth;
 	t.setHeight = setHeight;
-	
+
 	// locals
 	var body;
 	var firstDay;
 	var nwe;
 	var tm;
 	var colFormat;
-	
-	
+
+
 	function render(date, delta) {
 		if (delta) {
 			addDays(date, opt('listPage') * delta);
@@ -284,7 +303,7 @@ function ListView(element, calendar) {
 		t.visEnd = addDays(cloneDate(t.start), opt('listRange'));
 		addMinutes(t.visEnd, -1);  // set end to 23:59
 		t.title = formatDates(date, t.visEnd, opt('titleFormat'));
-		
+
 		updateOptions();
 
 		if (!body) {
@@ -293,29 +312,30 @@ function ListView(element, calendar) {
 			clearEvents();
 		}
 	}
-	
-	
+
+
 	function updateOptions() {
 		firstDay = opt('firstDay');
 		nwe = opt('weekends') ? 0 : 1;
 		tm = opt('theme') ? 'ui' : 'fc';
 		colFormat = opt('columnFormat', 'day');
 	}
-	
-	
+
+
 	function buildSkeleton() {
 		body = $('<div>').addClass('fc-list-content').appendTo(element);
 	}
-	
+
 	function setHeight(height, dateChanged) {
-	  if (!opt('listNoHeight'))
-		  body.css('height', (height-1)+'px').css('overflow', 'auto');
+		if (!opt('listNoHeight')) {
+			body.css('height', (height-1)+'px').css('overflow', 'auto');
+		}
 	}
 
 	function setWidth(width) {
 		// nothing to be done here
 	}
-	
+
 	function dummy() {
 		// Stub.
 	}
