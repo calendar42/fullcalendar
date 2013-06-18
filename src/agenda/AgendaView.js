@@ -179,7 +179,7 @@ function AgendaView(element, calendar, viewName) {
 			"<table style='width:100%' class='fc-agenda-days fc-border-separate' cellspacing='0'>" +
 			"<thead>" +
 			"<tr>" +
-			"<th class='fc-agenda-axis " + headerClass + "'>" + (opt('weekNumbers') ? 'Wk' + t.visStart.getWeek() : '&nbsp;') + "</th>";
+			"<th class='fc-agenda-axis " + headerClass + "'>" + (opt('weekNumbers') ? '<a href="#week-header-click">Wk' + t.visStart.getWeek() : '</a>&nbsp;') + "</th>";
 		for (i=0; i<colCnt; i++) {
 			s +=
 				"<th class='fc- fc-col" + i + ' ' + headerClass + "'/>"; // fc- needed for setDayID
@@ -315,13 +315,13 @@ function AgendaView(element, calendar, viewName) {
 		var today = clearTime(new Date());
         
         if (opt('weekNumbers')) {
-            dayHead.find('th.fc-first').html('Wk ' + colDate(0).getWeek());
+            dayHead.find('th.fc-first a').html('Wk ' + colDate(0).getWeek());
         }
 
 		for (i=0; i<colCnt; i++) {
 			date = colDate(i);
 			headCell = dayHeadCells.eq(i);
-            headCell.html('<span class="day-header">' + formatDate(date, colFormat) + '</span>');
+            headCell.html('<a href="#day-header-click" data-day="' + date.getTime() + '" class="day-header">' + formatDate(date, colFormat) + '</a>');
 			bodyCell = dayBodyCells.eq(i);
 			if (+date == +today) {
 				bodyCell.addClass(tm + '-state-highlight fc-today');

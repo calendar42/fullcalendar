@@ -64,6 +64,7 @@ function AgendaEventRenderer() {
 		if (event.allDay) {
 			container = getDaySegmentContainer();
 		}
+		if (!container) { return; }
 		var eventElement = container.find('[data-event-id="' + eventID + '"]');
 		eventElement.each(function () {
 			var el = $(this);
