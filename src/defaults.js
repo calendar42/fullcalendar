@@ -66,6 +66,7 @@ var defaults = {
 	listTexts: {
 		until: 'until',
 		past: 'Past events',
+		yesterday: 'Yesterday',
 		today: 'Today',
 		tomorrow: 'Tomorrow',
 		thisWeek: 'This week',
@@ -81,6 +82,7 @@ var defaults = {
 	listRange: 30,  // number of days to be displayed
 	listPage: 7,  // number of days to jump when paging
 	tableCols: ['handle', 'date', 'time', 'title'],
+	listShowEmptyDays: false,
 	
 	// jquery-ui theming
 	theme: false,
