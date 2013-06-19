@@ -97,16 +97,19 @@ function EventManager(options, _sources) {
 		var i;
 		var fetchers = fc.sourceFetchers;
 		var res;
-		for (i=0; i<fetchers.length; i++) {
-			res = fetchers[i](source, rangeStart, rangeEnd, callback);
-			if (res === true) {
-				// the fetcher is in charge. made its own async request
-				return;
-			}
-			else if (typeof res == 'object') {
-				// the fetcher returned a new source. process it
-				_fetchEventSource(res, callback);
-				return;
+
+		if (fetchers) {
+			for (i=0; i<fetchers.length; i++) {
+				res = fetchers[i](source, rangeStart, rangeEnd, callback);
+				if (res === true) {
+					// the fetcher is in charge. made its own async request
+					return;
+				}
+				else if (typeof res == 'object') {
+					// the fetcher returned a new source. process it
+					_fetchEventSource(res, callback);
+					return;
+				}
 			}
 		}
 		var events = source.events;

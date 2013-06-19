@@ -81,6 +81,7 @@ var defaults = {
 	listSections: 'month',  // false|'day'|'week'|'month'|'smart'
 	listRange: 30,  // number of days to be displayed
 	listPage: 7,  // number of days to jump when paging
+	listTimespan: 'week',
 	tableCols: ['handle', 'date', 'time', 'title'],
 	listShowEmptyDays: false,
 	

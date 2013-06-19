@@ -36,7 +36,7 @@ function ListEventRenderer() {
 		reportEventClear();
 		getListContainer().empty();
 	}
-	
+
 	function renderEvents(events, modifiedEventId) {
 		events.sort(sortCmp);
 		reportEvents(events);
@@ -51,7 +51,8 @@ function ListEventRenderer() {
 		var event, i, dd, wd, md, seg, segHash, curSegHash, segDate, curSeg = -1;
 		var today = clearTime(new Date());
 		var weekstart = addDays(cloneDate(today), -((today.getDay() - firstDay + 7) % 7));
-		var viewstart = addDays(cloneDate(t.start), -((t.start.getDay() - firstDay + 7) % 7));
+		var viewstart = cloneDate(t.visStart);
+
 
 		for (i=0; i < opt('listRange'); i++) {
 			// define sections of this event
@@ -117,7 +118,9 @@ function ListEventRenderer() {
 			// Get the index of the event compared to the week start
 			dd = dayDiff(segDate, viewstart);
 
-			segs[dd].events.push(event);
+			if (segs[dd]) {
+				segs[dd].events.push(event);
+			}
 		}
 		return segs;
 	}
@@ -298,10 +301,23 @@ function ListView(element, calendar) {
 		if (delta) {
 			addDays(date, opt('listPage') * delta);
 		}
-		t.start = t.visStart = cloneDate(date, true);
-		t.end = addDays(cloneDate(t.start), opt('listPage'));
-		t.visEnd = addDays(cloneDate(t.start), opt('listRange'));
-		addMinutes(t.visEnd, -1);  // set end to 23:59
+
+
+		var visStart, visEnd;
+		if (opt('listTimespan') === 'week') {
+			visStart = addDays(cloneDate(date), -((date.getDay() - opt('firstDay') + 7) % 7));
+			visEnd = addDays(cloneDate(visStart), opt('listRange'));
+		} else {
+			visStart = cloneDate(date);
+			visEnd = addDays(cloneDate(date), opt('listRange'));
+		}
+		addMinutes(visEnd, -1);  // set end to 23:59
+
+		t.start = cloneDate(visStart);
+		t.end = cloneDate(visEnd);
+		t.visStart = visStart;
+		t.visEnd = visEnd;
+
 		t.title = formatDates(date, t.visEnd, opt('titleFormat'));
 
 		updateOptions();

@@ -472,18 +472,22 @@ function Calendar(element, options, eventSources) {
 	
 	
 	function option(name, value) {
+		var allowedOptions = ['maxHeight', 'selectable', 'editable', 'listRange', 'listSections', 'listTimespan'];
+
 		if (value === undefined) {
 			return options[name];
 		}
-		if (name == 'height' || name == 'contentHeight' || name == 'aspectRatio') {
+
+        if (name == 'height' || name == 'contentHeight' || name == 'aspectRatio') {
 			options[name] = value;
 			updateSize();
 		} else if (name.indexOf('list') == 0 || name == 'tableCols') {
 			options[name] = value;
 			currentView.start = null; // force re-render
-		} else if (name == 'maxHeight' || name == 'selectable' || name == 'editable') {
+        } 
+	        else if (allowedOptions.indexOf(name) > -1) {
 			options[name] = value;
-        }
+  		}
 	}
 	
 	
