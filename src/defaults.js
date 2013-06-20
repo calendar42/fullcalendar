@@ -74,9 +74,10 @@ var defaults = {
 		thisMonth: 'This month',
 		nextMonth: 'Next month',
 		future: 'Future events',
-		week: 'W'
+		week: 'W',
+		readonly: 'Read-only'
 	},
-	
+
 	// list/table options
 	listSections: 'month',  // false|'day'|'week'|'month'|'smart'
 	listRange: 30,  // number of days to be displayed

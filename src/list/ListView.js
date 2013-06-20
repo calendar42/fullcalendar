@@ -4,7 +4,7 @@
 
 function ListEventRenderer() {
 	var t = this;
-	
+
 	// exports
 	t.renderEvents = renderEvents;
 	t.renderEventTime = renderEventTime;
@@ -12,7 +12,7 @@ function ListEventRenderer() {
 	t.clearEvents = clearEvents;
 	t.lazySegBind = lazySegBind;
 	t.sortCmp = sortCmp;
-	
+
 	// imports
 	DayEventRenderer.call(t);
 	var opt = t.opt;
@@ -27,11 +27,11 @@ function ListEventRenderer() {
 	var calendar = t.calendar;
 	var formatDate = calendar.formatDate;
 	var formatDates = calendar.formatDates;
-	
-	
+
+
 	/* Rendering
 	--------------------------------------------------------------------*/
-	
+
 	function clearEvents() {
 		reportEventClear();
 		getListContainer().empty();
@@ -48,7 +48,7 @@ function ListEventRenderer() {
 		var colFormat = opt('titleFormat', 'day');
 		var firstDay = opt('firstDay');
 		var segmode = opt('listSections');
-		var event, i, dd, wd, md, seg, segHash, curSegHash, segDate, curSeg = -1;
+		var event, i, dd, ddEnd, wd, md, seg, segHash, curSegHash, segDate, segEndDate, curSeg = -1;
 		var today = clearTime(new Date());
 		var weekstart = addDays(cloneDate(today), -((today.getDay() - firstDay + 7) % 7));
 		var viewstart = cloneDate(t.visStart);
@@ -115,11 +115,16 @@ function ListEventRenderer() {
 			// define sections of this event
 			// create smart sections such as today, tomorrow, this week, next week, next month, ect.
 			segDate = cloneDate(event.start < t.start && event.end > t.start ? t.start : event.start, true);
+			segEndDate = event.end ? cloneDate(event.end > t.end ? t.end : event.end, true) : cloneDate(event.start);
+
 			// Get the index of the event compared to the week start
 			dd = dayDiff(segDate, viewstart);
+			ddEnd = dayDiff(segEndDate, viewstart);
 
-			if (segs[dd]) {
-				segs[dd].events.push(event);
+			for (; dd <= ddEnd; dd++) {
+				if (segs[dd]) {
+					segs[dd].events.push(event);
+				}
 			}
 		}
 		return segs;
@@ -129,16 +134,17 @@ function ListEventRenderer() {
 		var sd = a.start.getTime() - b.start.getTime();
 		return sd || (a.end ? a.end.getTime() : 0) - (b.end ? b.end.getTime() : 0);
 	}
-	
+
 	function renderSegs(segs, modifiedEventId) {
 		var tm = opt('theme') ? 'ui' : 'fc';
 		var headerClass = tm + "-widget-header";
 		var contentClass = tm + "-widget-content";
-		var i, j, seg, event, times, s, skinCss, skinCssAttr, classes, segContainer, eventElement, eventElements, triggerRes;
+		var i, j, seg, event, times, s, classes, segContainer, eventElement, eventElements, triggerRes;
 
 		for (j=0; j < segs.length; j++) {
 			seg = segs[j];
-			
+			var segEnd = addDays(cloneDate(seg.start), 1);
+
 			if (!opt('listShowEmptyDays') && seg.events.length === 0) {
 				continue;
 			}
@@ -148,36 +154,60 @@ function ListEventRenderer() {
 			}
 			segContainer = $('<div>').addClass('fc-list-section ' + contentClass).appendTo(getListContainer());
 			s = '';
-			
+
 			for (i=0; i < seg.events.length; i++) {
 				event = seg.events[i];
 				times = renderEventTime(event, seg);
-				skinCss = getSkinCss(event, opt);
-				skinCssAttr = (skinCss ? " style='" + skinCss + "'" : '');
+
 				classes = ['fc-event', 'fc-event-skin', 'fc-event-vert', 'fc-corner-top', 'fc-corner-bottom'].concat(event.className);
 				if (event.source && event.source.className) {
 					classes = classes.concat(event.source.className);
 				}
-				
-				s += 
-					"<div class='" + classes.join(' ') + "'" + skinCssAttr + ">" +
-					"<div class='fc-event-inner fc-event-skin'" + skinCssAttr + ">" +
-					"<div class='fc-event-head fc-event-skin'" + skinCssAttr + ">" +
-					"<div class='fc-event-time'>" +
-					(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
-					(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
-					"</div>" +
-					"</div>" +
-					"<div class='fc-event-content'>" +
-					"<div class='fc-event-title'>" +
-					htmlEscape(event.title) +
-					"</div>" +
-					"</div>" +
-					"<div class='fc-event-bg'></div>" +
-					"</div>" + // close inner
+
+				if (event.allDay) {
+					classes.push('all-day');
+
+					if (event.start >= seg.start && event.start < segEnd) {
+						classes.push('all-day-start');
+					}
+
+					// Add one day because all day events go from 31-01-2013T00:00/31-01-2013T00:00
+					var eventEnd = event.end ? addDays(cloneDate(event.end), 1) : addDays(cloneDate(event.start), 1);
+					if (eventEnd <= segEnd && eventEnd > seg.start) {
+						classes.push('all-day-end');
+					}
+				}
+
+				s +=
+					"<div class='" + classes.join(' ') + "'>" +
+						"<div class='fc-event-inner fc-event-skin'>" +
+							"<div class='fc-event-head fc-event-skin'>" +
+								"<div class='fc-event-time'>" +
+									(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
+									(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
+								"</div>";
+								if (event.colors) {
+									s += '<div class="event-colors">';
+									for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
+										s += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
+									}
+									s += '</div>';
+								}
+
+							s += "</div>" +
+							"<div class='fc-event-content'>" +
+								"<div class='fc-event-title'>" +
+									htmlEscape(event.title) + (event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
+								"</div>" +
+								"<div class='fc-event-location'>" +
+									(event.location_text ? htmlEscape(event.location_text) : '') +
+								"</div>" +
+							"</div>" +
+							"<div class='fc-event-bg'></div>" +
+						"</div>" + // close inner
 					"</div>";  // close outer
 			}
-			
+
 			segContainer[0].innerHTML = s;
 			eventElements = segContainer.children();
 
@@ -201,13 +231,13 @@ function ListEventRenderer() {
 					reportEventElement(event, eventElement);
 				}
 			}
-		
+
 			lazySegBind(segContainer, seg, eventElementHandlers);
 		}
-		
+
 		markFirstLast(getListContainer());
 	}
-	
+
 	// event time/date range to display
 	function renderEventTime(event, seg) {
 		var timeFormat = opt('timeFormat');
@@ -215,34 +245,34 @@ function ListEventRenderer() {
 		var segmode = opt('listSections');
 		var duration = event.end ? event.end.getTime() - event.start.getTime() : 0;
 		var datestr = '', timestr = '';
-		
-		if (segmode == 'smart') {
+
+		if (segmode === 'smart') {
 			if (event.start < seg.start) {
 				datestr = opt('listTexts', 'until') + ' ' + formatDate(event.end, (event.allDay || event.end.getDate() != seg.start.getDate()) ? dateFormat : timeFormat);
 			} else if (duration > DAY_MS) {
 				datestr = formatDates(event.start, event.end, dateFormat + '{ - ' + dateFormat + '}');
-			} else if (seg.daydiff == 0) {
+			} else if (seg.daydiff === 0) {
 				datestr = opt('listTexts', 'today');
-			}	else if (seg.daydiff == 1) {
+			}	else if (seg.daydiff === 1) {
 				datestr = opt('listTexts', 'tomorrow');
-			} else if (seg.weekdiff == 0 || seg.weekdiff == 1) {
+			} else if (seg.weekdiff === 0 || seg.weekdiff === 1) {
 				datestr = formatDate(event.start, 'dddd');
 			} else if (seg.daydiff > 1 || seg.daydiff < 0) {
 				datestr = formatDate(event.start, dateFormat);
 			}
-		} else if (segmode != 'day') {
+		} else if (segmode != 'day' && segmode != 'smart-day') {
 			datestr = formatDates(event.start, event.end, dateFormat + (duration > DAY_MS ? '{ - ' + dateFormat + '}' : ''));
 		}
-		
+
 		if (!datestr && event.allDay) {
 			timestr = opt('allDayText');
 		} else if ((duration < DAY_MS || !datestr) && !event.allDay) {
 			timestr = formatDates(event.start, event.end, timeFormat);
 		}
-		
+
 		return [datestr, timestr];
 	}
-	
+
 	function lazySegBind(container, seg, bindHandlers) {
 		container.unbind('mouseover').mouseover(function(ev) {
 			var parent = ev.target, e = parent, i, event;
