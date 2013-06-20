@@ -28,8 +28,12 @@ th {
 	font-weight: normal;
 }
 
+a.day-header {
+	display: block;
+	}
+
 .fc-agenda-days th {
-	text-align: center;
+	text-align: left;
 	}
 	
 .fc-agenda .fc-agenda-axis {
@@ -41,6 +45,12 @@ th {
 	font-weight: normal;
 	}
 	
+.fc-agenda .fc-agenda-axis.fc-first {
+	text-align: left;
+	}
+.fc-agenda .fc-agenda-axis.fc-first a {
+	display: block;
+	}
 .fc-agenda .fc-day-content {
 	padding: 2px 2px 1px;
 	}

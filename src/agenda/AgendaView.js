@@ -174,12 +174,17 @@ function AgendaView(element, calendar, viewName) {
 		var maxd;
 		var minutes;
 		var slotNormal = opt('slotMinutes') % 15 == 0;
-		
+		var elementType = colCnt !== 7 ? 'a' : 'div';
+
 		s =
 			"<table style='width:100%' class='fc-agenda-days fc-border-separate' cellspacing='0'>" +
 			"<thead>" +
 			"<tr>" +
-			"<th class='fc-agenda-axis " + headerClass + "'>" + (opt('weekNumbers') ? '<a href="#week-header-click">Wk' + t.visStart.getWeek() : '</a>&nbsp;') + "</th>";
+			"<th class='fc-agenda-axis " + headerClass + "'>";
+		if (opt('weekNumbers')) {
+			s += '<'+elementType+' class="weeknumber-header" href="#week-header-click">Wk' + t.visStart.getWeek() + '</'+elementType+'>';
+		}
+		s += "</th>";
 		for (i=0; i<colCnt; i++) {
 			s +=
 				"<th class='fc- fc-col" + i + ' ' + headerClass + "'/>"; // fc- needed for setDayID
@@ -313,6 +318,7 @@ function AgendaView(element, calendar, viewName) {
 		var bodyCell;
 		var date;
 		var today = clearTime(new Date());
+		var elementType = colCnt !== 1 ? 'a' : 'div';
         
         if (opt('weekNumbers')) {
             dayHead.find('th.fc-first a').html('Wk ' + colDate(0).getWeek());
@@ -321,7 +327,7 @@ function AgendaView(element, calendar, viewName) {
 		for (i=0; i<colCnt; i++) {
 			date = colDate(i);
 			headCell = dayHeadCells.eq(i);
-            headCell.html('<a href="#day-header-click" data-day="' + date.getTime() + '" class="day-header">' + formatDate(date, colFormat) + '</a>');
+            headCell.html('<'+elementType+' href="#day-header-click" data-day="' + date.getTime() + '" class="day-header">' + formatDate(date, colFormat) + '</'+elementType+'>');
 			bodyCell = dayBodyCells.eq(i);
 			if (+date == +today) {
 				bodyCell.addClass(tm + '-state-highlight fc-today');
