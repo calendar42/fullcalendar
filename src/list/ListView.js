@@ -137,20 +137,26 @@ function ListEventRenderer() {
 
 	function renderSegs(segs, modifiedEventId) {
 		var tm = opt('theme') ? 'ui' : 'fc';
-		var headerClass = tm + "-widget-header";
-		var contentClass = tm + "-widget-content";
+		var contentClass = "";
+		// var headerClass = tm + "-widget-header";
+		// var contentClass = tm + "-widget-content";
 		var i, j, seg, event, times, s, classes, segContainer, eventElement, eventElements, triggerRes;
 
 		for (j=0; j < segs.length; j++) {
 			seg = segs[j];
 			var segEnd = addDays(cloneDate(seg.start), 1);
+			var headerClass = '';
 
 			if (!opt('listShowEmptyDays') && seg.events.length === 0) {
 				continue;
 			}
 
+			if (seg.daydiff === 0) {
+				headerClass += 'today';
+			}
+
 			if (seg.title) {
-				$('<div class="fc-list-header ' + headerClass + '">' + htmlEscape(seg.title) + '</div>').appendTo(getListContainer());
+				$('<div class="fc-list-header ' + headerClass + '"><h3>' + htmlEscape(seg.title) + '</h3></div>').appendTo(getListContainer());
 			}
 			segContainer = $('<div>').addClass('fc-list-section ' + contentClass).appendTo(getListContainer());
 			s = '';
@@ -196,10 +202,11 @@ function ListEventRenderer() {
 
 							s += "</div>" +
 							"<div class='fc-event-content'>" +
-								"<div class='fc-event-title'>" +
+								"<div class='fc-event-icons'></div>" +
+								"<div class='fc-event-title'><h3>" +
 									htmlEscape(event.title) + (event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
-								"</div>" +
-								"<div class='fc-event-location'>" +
+								"</h3></div>" +
+								"<div class='fc-event-location muted'>" +
 									(event.location_text ? htmlEscape(event.location_text) : '') +
 								"</div>" +
 							"</div>" +
