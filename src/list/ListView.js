@@ -185,7 +185,7 @@ function ListEventRenderer() {
 			}
 
 			if (seg.title) {
-				$('<div class="fc-widget-header ' + headerClass + '"> <a href="#add-event" data-day="' + seg.start.getTime() + '" style="float:right"></a> <'+dayHeaderElementType+' class="day-header" href="#day-header-click" data-day="' + seg.start.getTime() + '">' + htmlEscape(seg.title) + '</'+dayHeaderElementType+'></div>').appendTo(getListContainer());
+				$('<div class="fc-widget-header ' + headerClass + '"> <a class="add-event-from-day" href="#add-event-from-day" data-day="' + seg.start.getTime() + '" style="position:absolute;right:0;"></a> <'+dayHeaderElementType+' class="day-header" href="#day-header-click" data-day="' + seg.start.getTime() + '">' + htmlEscape(seg.title) + '</'+dayHeaderElementType+'></div>').appendTo(getListContainer());
 			}
 			segContainer = $('<div>').addClass('fc-list-section ' + contentClass).appendTo(getListContainer());
 			s = '';
