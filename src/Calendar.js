@@ -30,6 +30,7 @@ function Calendar(element, options, eventSources) {
 	t.option = option;
 	t.trigger = trigger;
 	t.renderEventsSimplified = renderEventsSimplified;
+	t.renderEventMarkers = renderEventMarkers;
 	
 	
 	// imports
@@ -379,6 +380,13 @@ function Calendar(element, options, eventSources) {
 	    // Not all views have this function just yet
 	    if (currentView.renderEventsSimplified) {
 	        currentView.renderEventsSimplified(events, classNames);
+	    }
+	}
+
+	function renderEventMarkers(events) {
+	    // Not all views have this function just yet
+	    if (currentView.renderEventMarkers) {
+	        currentView.renderEventMarkers(events);
 	    }
 	}
 

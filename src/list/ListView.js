@@ -12,6 +12,7 @@ function ListEventRenderer() {
 	t.clearEvents = clearEvents;
 	t.lazySegBind = lazySegBind;
 	t.sortCmp = sortCmp;
+	t.renderEventMarkers = renderEventMarkers;
 
 	// imports
 	DayEventRenderer.call(t);
@@ -43,13 +44,38 @@ function ListEventRenderer() {
 		renderSegs(compileSegs(events), modifiedEventId);
 	}
 
+	function renderEventMarkers(events) {
+		var listContainer = getListContainer();
+		listContainer.find('.fc-event-marker').remove();
+		for (i=0; i < events.length; i++) {
+			renderEventMarker(events[i]);
+		}
+	}
+
+	function renderEventMarker(event) {
+		var day = clearTime(cloneDate(event.start));
+		var listContainer = getListContainer();
+		var dayHeader = listContainer.find('.day-header[data-day="'+day.getTime()+'"]');
+		var position = '';
+		if (event.allDay) {
+			position = 'left:5%;right:5%;width:auto;';
+		} else {
+			position = 'left:'+(event.start.getHours()/24*100)+'%;';
+			if (event.end) {
+				position += 'right:'+(100-(event.end.getHours()/24*100))+'%;width:auto;';
+			}
+		}
+		var html = '<div class="fc-event-marker" style="'+position+'background:'+event.colors[0]+';position: absolute;z-index:10;"></div>';
+		dayHeader.append(html);
+	}
+
 	function compileSegs(events) {
 		var segs = [];
 		var colFormat = opt('titleFormat', 'day');
 		var firstDay = opt('firstDay');
 		var segmode = opt('listSections');
 		var event, i, dd, ddEnd, wd, md, seg, segHash, curSegHash, segDate, segEndDate, curSeg = -1;
-		var today = clearTime(new Date());
+		var today = clearTime(new Date()); // for determining the segment title
 		var weekstart = addDays(cloneDate(today), -((today.getDay() - firstDay + 7) % 7));
 		var viewstart = cloneDate(t.visStart);
 
@@ -86,12 +112,8 @@ function ListEventRenderer() {
 			} else if (segmode === 'week') {
 				segHash = opt('listTexts', 'week') + formatDate(segDate, ' W');
 			} else if (segmode == 'smart-day') {
-				if (dd === -1) {
-					segHash = opt('listTexts', 'yesterday');
-				} else if (dd === 0) {
-					segHash = opt('listTexts', 'today');
-				} else if (dd === 1) {
-					segHash = opt('listTexts', 'tomorrow');
+				if (dd === 0) {
+					segHash = formatDate(segDate, colFormat) + ' – ' + opt('listTexts', 'today');
 				} else {
 					segHash = formatDate(segDate, colFormat);
 				}
@@ -137,15 +159,21 @@ function ListEventRenderer() {
 
 	function renderSegs(segs, modifiedEventId) {
 		var tm = opt('theme') ? 'ui' : 'fc';
-		var contentClass = "";
+		var weekHeaderElementType = segs.length !== 7 ? 'a' : 'div';
+		var dayHeaderElementType = segs.length !== 1 ? 'a' : 'div';
 		// var headerClass = tm + "-widget-header";
 		// var contentClass = tm + "-widget-content";
 		var i, j, seg, event, times, s, classes, segContainer, eventElement, eventElements, triggerRes;
+
+		if (opt('weekNumbers')) {
+			$('<div class="fc-widget-header"><'+weekHeaderElementType+' class="weeknumber-header" href="#week-header-click">Week ' + t.visStart.getWeek() + '</'+weekHeaderElementType+'></div>').appendTo(getListContainer());
+		}
 
 		for (j=0; j < segs.length; j++) {
 			seg = segs[j];
 			var segEnd = addDays(cloneDate(seg.start), 1);
 			var headerClass = '';
+			var contentClass = '';
 
 			if (!opt('listShowEmptyDays') && seg.events.length === 0) {
 				continue;
@@ -153,66 +181,71 @@ function ListEventRenderer() {
 
 			if (seg.daydiff === 0) {
 				headerClass += 'today';
+				contentClass += 'today';
 			}
 
 			if (seg.title) {
-				$('<div class="fc-list-header ' + headerClass + '"><h3>' + htmlEscape(seg.title) + '</h3></div>').appendTo(getListContainer());
+				$('<div class="fc-widget-header ' + headerClass + '"> <a href="#add-event" data-day="' + seg.start.getTime() + '" style="float:right"></a> <'+dayHeaderElementType+' class="day-header" href="#day-header-click" data-day="' + seg.start.getTime() + '">' + htmlEscape(seg.title) + '</'+dayHeaderElementType+'></div>').appendTo(getListContainer());
 			}
 			segContainer = $('<div>').addClass('fc-list-section ' + contentClass).appendTo(getListContainer());
 			s = '';
 
-			for (i=0; i < seg.events.length; i++) {
-				event = seg.events[i];
-				times = renderEventTime(event, seg);
+			if (seg.events.length === 0) {
+				s += '<a href="#no-events" class="fc-no-events"></a>';
+			} else {
+				for (i=0; i < seg.events.length; i++) {
+					event = seg.events[i];
+					times = renderEventTime(event, seg);
 
-				classes = ['fc-event', 'fc-event-skin', 'fc-event-vert', 'fc-corner-top', 'fc-corner-bottom'].concat(event.className);
-				if (event.source && event.source.className) {
-					classes = classes.concat(event.source.className);
-				}
-
-				if (event.allDay) {
-					classes.push('all-day');
-
-					if (event.start >= seg.start && event.start < segEnd) {
-						classes.push('all-day-start');
+					classes = ['fc-event', 'fc-event-skin', 'fc-event-vert', 'fc-corner-top', 'fc-corner-bottom'].concat(event.className);
+					if (event.source && event.source.className) {
+						classes = classes.concat(event.source.className);
 					}
 
-					// Add one day because all day events go from 31-01-2013T00:00/31-01-2013T00:00
-					var eventEnd = event.end ? addDays(cloneDate(event.end), 1) : addDays(cloneDate(event.start), 1);
-					if (eventEnd <= segEnd && eventEnd > seg.start) {
-						classes.push('all-day-end');
-					}
-				}
+					if (event.allDay) {
+						classes.push('all-day');
 
-				s +=
-					"<div class='" + classes.join(' ') + "'>" +
-						"<div class='fc-event-inner fc-event-skin'>" +
-							"<div class='fc-event-head fc-event-skin'>" +
-								"<div class='fc-event-time'>" +
-									(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
-									(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
-								"</div>";
-								if (event.colors) {
+						if (event.start >= seg.start && event.start < segEnd) {
+							classes.push('all-day-start');
+						}
+
+						// Add one day because all day events go from 31-01-2013T00:00/31-01-2013T00:00
+						var eventEnd = event.end ? addDays(cloneDate(event.end), 1) : addDays(cloneDate(event.start), 1);
+						if (eventEnd <= segEnd && eventEnd > seg.start) {
+							classes.push('all-day-end');
+						}
+					}
+
+					s +=
+						"<div class='" + classes.join(' ') + "'>" +
+							"<div class='fc-event-inner fc-event-skin'>" +
+								"<div class='fc-event-head fc-event-skin'>" +
+									"<div class='fc-event-time'>" +
+										(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
+										(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
+									"</div>";
 									s += '<div class="event-colors">';
-									for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
-										s += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
+									if (event.colors) {
+										for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
+											s += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
+										}
 									}
 									s += '</div>';
-								}
 
-							s += "</div>" +
-							"<div class='fc-event-content'>" +
-								"<div class='fc-event-icons'></div>" +
-								"<div class='fc-event-title'><h3>" +
-									htmlEscape(event.title) + (event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
-								"</h3></div>" +
-								"<div class='fc-event-location muted'>" +
-									(event.location_text ? htmlEscape(event.location_text) : '') +
+								s += "</div>" +
+								"<div class='fc-event-content'>" +
+									"<div class='fc-event-icons'></div>" +
+									"<div class='fc-event-title'><h3>" +
+										htmlEscape(event.title) + //(event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
+									"</h3></div>" +
+									"<div class='fc-event-location muted'>" +
+										(event.location_text ? htmlEscape(event.location_text) : '–') +
+									"</div>" +
 								"</div>" +
-							"</div>" +
-							"<div class='fc-event-bg'></div>" +
-						"</div>" + // close inner
-					"</div>";  // close outer
+								"<div class='fc-event-bg'></div>" +
+							"</div>" + // close inner
+						"</div>";  // close outer
+				}
 			}
 
 			segContainer[0].innerHTML = s;
@@ -272,7 +305,8 @@ function ListEventRenderer() {
 		}
 
 		if (!datestr && event.allDay) {
-			timestr = opt('allDayText');
+			// timestr = opt('allDayText');
+			timestr = '';
 		} else if ((duration < DAY_MS || !datestr) && !event.allDay) {
 			timestr = formatDates(event.start, event.end, timeFormat);
 		}
@@ -350,9 +384,9 @@ function ListView(element, calendar) {
 		}
 		addMinutes(visEnd, -1);  // set end to 23:59
 
-		t.start = cloneDate(visStart);
+		t.start = clearTime(cloneDate(visStart));
 		t.end = cloneDate(visEnd);
-		t.visStart = visStart;
+		t.visStart = clearTime(visStart);
 		t.visEnd = visEnd;
 
 		t.title = formatDates(date, t.visEnd, opt('titleFormat'));
