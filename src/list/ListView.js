@@ -217,20 +217,13 @@ function ListEventRenderer() {
 					}
 
 					s +=
-						"<div class='" + classes.join(' ') + "'>" +
+						"<div class='" + classes.join(' ') + "' data-event-id='"+event.id+"''>" +
 							"<div class='fc-event-inner fc-event-skin'>" +
 								"<div class='fc-event-head fc-event-skin'>" +
 									"<div class='fc-event-time'>" +
 										(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
 										(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
 									"</div>";
-									s += '<div class="event-colors">';
-									if (event.colors) {
-										for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
-											s += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
-										}
-									}
-									s += '</div>';
 
 								s += "</div>" +
 								"<div class='fc-event-content'>" +
@@ -242,8 +235,15 @@ function ListEventRenderer() {
 										(event.location_text ? htmlEscape(event.location_text) : '–') +
 									"</div>" +
 								"</div>" +
-								"<div class='fc-event-bg'></div>" +
-							"</div>" + // close inner
+								"<div class='fc-event-bg'></div>";
+								s += '<div class="event-colors">';
+								if (event.colors) {
+									for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
+										s += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
+									}
+								}
+								s += '</div>';
+							s += "</div>" + // close inner
 						"</div>";  // close outer
 				}
 			}
