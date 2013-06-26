@@ -182,7 +182,7 @@ function AgendaView(element, calendar, viewName) {
 			"<tr>" +
 			"<th class='fc-agenda-axis " + headerClass + "'>";
 		if (opt('weekNumbers')) {
-			s += '<'+elementType+' class="weeknumber-header" href="#week-header-click">Wk' + t.visStart.getWeek() + '</'+elementType+'>';
+			s += '<'+elementType+' class="weeknumber-header" href="#week-header-click">Wk<span class="weeknumber-number">' + t.visStart.getWeek() + '</span></'+elementType+'>';
 		}
 		s += "</th>";
 		for (i=0; i<colCnt; i++) {
@@ -321,7 +321,7 @@ function AgendaView(element, calendar, viewName) {
 		var elementType = colCnt !== 1 ? 'a' : 'div';
         
         if (opt('weekNumbers')) {
-            dayHead.find('th.fc-first a').html('Wk ' + colDate(0).getWeek());
+            dayHead.find('th.fc-first span.weeknumber-number').html(colDate(0).getWeek());
         }
 
 		for (i=0; i<colCnt; i++) {

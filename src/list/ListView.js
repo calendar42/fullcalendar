@@ -166,7 +166,7 @@ function ListEventRenderer() {
 		var i, j, seg, event, times, s, classes, segContainer, eventElement, eventElements, triggerRes;
 
 		if (opt('weekNumbers')) {
-			$('<div class="fc-widget-header"><'+weekHeaderElementType+' class="weeknumber-header" href="#week-header-click">Week ' + t.visStart.getWeek() + '</'+weekHeaderElementType+'></div>').appendTo(getListContainer());
+			$('<div class="fc-widget-header"><'+weekHeaderElementType+' class="weeknumber-header" href="#week-header-click">Week <span class="weeknumber-number">' + t.visStart.getWeek() + '</span></'+weekHeaderElementType+'></div>').appendTo(getListContainer());
 		}
 
 		for (j=0; j < segs.length; j++) {
