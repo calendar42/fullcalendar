@@ -10,6 +10,7 @@ function AgendaEventRenderer() {
 	t.slotSegHtml = slotSegHtml;
 	t.bindDaySeg = bindDaySeg;
 	t.renderEventsSimplified = renderEventsSimplified;
+	t.renderEventMarkers = renderEventMarkers;
 	t.updateEventNoRerender = updateEventNoRerender;
 
 	
@@ -37,6 +38,7 @@ function AgendaEventRenderer() {
 	var colContentRight = t.colContentRight;
 	var renderDaySegs = t.renderDaySegs;
 	var renderDaySegsSimplified = t.renderDaySegsSimplified;
+	// var renderEventMarkersDaySeg = t.renderEventMarkersDaySeg;
 	var resizableDayEvent = t.resizableDayEvent; // TODO: streamline binding architecture
 	var getColCnt = t.getColCnt;
 	var getColWidth = t.getColWidth;
@@ -113,7 +115,29 @@ function AgendaEventRenderer() {
 
 	/* Rendering
 	----------------------------------------------------------------------------*/
-	
+	function renderEventMarkers (events, classNames) {
+		var i, len=events.length,
+			dayEvents=[],
+			slotEvents=[];
+		for (i=0; i<len; i++) {
+			if (events[i].allDay) {
+				dayEvents.push(events[i]);
+			}else{
+				slotEvents.push(events[i]);
+			}
+		}
+		// clear both segments
+		getSlotSegmentContainer().find('.fc-event-marker').remove();
+		getDaySegmentContainer().find('.fc-event-marker').remove();
+
+		if (opt('allDaySlot') && dayEvents.length > 0) {
+			renderEventMarkersDaySeg(compileDaySegs(dayEvents), classNames);
+		}
+		if (slotEvents.length > 0) {
+			renderEventMarkersSlotSeg(compileSlotSegs(slotEvents), classNames);
+		}
+	}
+
 	function renderEventsSimplified (events, classNames) {
 		var i, len=events.length,
 			dayEvents=[],
@@ -284,6 +308,77 @@ function AgendaEventRenderer() {
 	      }
           return;
     }
+
+    function renderEventMarkersDaySeg () {
+    	console.warn('implement me!');
+    }
+
+    // Render events in a simplified manner in the 'time slots' at the bottom
+    function renderEventMarkersSlotSeg (segs, classNames) {
+        var i, segCnt=segs.length, seg,
+    		event,
+    		eventElement,
+    		top, bottom,
+    		colI, levelI, forward,
+    		leftmost,
+    		outerWidth,
+    		left,
+    		html='',
+    		slotSegmentContainer = getSlotSegmentContainer(),
+    		rtl, dis, dit,
+    		colCnt = getColCnt(),
+    		overlapping = colCnt > 1,
+    		existing,
+    		lastVerticalPosition, shifts = 0,
+    		positions = {},
+    		p;
+
+    	if (rtl = opt('isRTL')) {
+    		dis = -1;
+    		dit = colCnt - 1;
+    	}else{
+    		dis = 1;
+    		dit = 0;
+    	}
+        
+          for (i=0; i<segCnt; i++) {
+              seg = segs[i];
+              event = seg.event;
+              seg.top = timePosition(seg.start, seg.start);
+              colI = seg.col;
+              levelI = seg.level;
+              forward = seg.forward || 0;
+              leftmost = colContentLeft(colI*dis + dit);
+              seg.outerWidth = 2;
+              seg.outerHeight = Math.abs(seg.bottom - seg.top);
+              seg.left = leftmost;
+
+              /**
+              * shift the marker to the right if there was already a marker on about the same height
+              * By filling object with mapping of left position and rounded top-position
+              * and if position was encountered before increase seg.left and increment the position mapping
+              * is done with an object as the incoming events don't need to be sorted
+              */
+              p = seg.left+'_'+Math.round(seg.top/10)*10;
+              if (positions[p]) {
+              	seg.left += 15*positions[p];
+              	positions[p]++;
+              } else {
+              	positions[p] = 1;
+              }
+
+              html += eventMarkerHtml(event, seg, classNames);
+          }
+          if (event) {
+          	existing = slotSegmentContainer.find('[data-event-id="'+event.id+'"]');
+          	if (existing.length === 0) {
+				eventElement = $(html).appendTo(slotSegmentContainer);
+          	} else {
+          		eventElement = $(html).replaceAll(existing);
+          	}
+	      }
+          return;
+    }
 	
 	// renders events in the 'time slots' at the bottom
 	
@@ -425,7 +520,13 @@ function AgendaEventRenderer() {
 		}
 					
 	}
-	
+		
+	function eventMarkerHtml (event, seg, classNames) {
+		var verticalPosition = "top:" + seg.top + "px;";
+		var html = "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;"+verticalPosition+ "left:" + (seg.left) + "px;background:"+event.colors[0]+";'></a>";
+		return html;
+	}
+
 	function slotSegSimplifiedHtml (event, seg, classNames) {
         var skinCss = getSkinCss(event, opt);
         var daycol = $('.fc-col0:first', t.element);

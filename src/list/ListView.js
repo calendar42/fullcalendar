@@ -65,7 +65,7 @@ function ListEventRenderer() {
 				position += 'right:'+(100-(event.end.getHours()/24*100))+'%;width:auto;';
 			}
 		}
-		var html = '<div class="fc-event-marker" style="'+position+'background:'+event.colors[0]+';position: absolute;z-index:10;"></div>';
+		var html = '<a class="fc-event-marker" href="#fc-event-marker" data-event-id="'+event.id+'" style="'+position+'background:'+event.colors[0]+';position: absolute;z-index:10;"></a>';
 		dayHeader.append(html);
 	}
 
