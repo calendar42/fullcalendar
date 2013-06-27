@@ -113,7 +113,7 @@ function ListEventRenderer() {
 				segHash = opt('listTexts', 'week') + formatDate(segDate, ' W');
 			} else if (segmode == 'smart-day') {
 				if (dd === 0) {
-					segHash = formatDate(segDate, colFormat) + ' – ' + opt('listTexts', 'today');
+					segHash = formatDate(segDate, colFormat) + ' <span class="today-badge pull-right"> ' + opt('listTexts', 'today') + '</span>';
 				} else {
 					segHash = formatDate(segDate, colFormat);
 				}
@@ -185,7 +185,7 @@ function ListEventRenderer() {
 			}
 
 			if (seg.title) {
-				$('<div class="fc-widget-header ' + headerClass + '"> <a class="add-event-from-day" href="#add-event-from-day" data-day="' + seg.start.getTime() + '" style="position:absolute;right:0;"></a> <'+dayHeaderElementType+' class="day-header" href="#day-header-click" data-day="' + seg.start.getTime() + '">' + htmlEscape(seg.title) + '</'+dayHeaderElementType+'></div>').appendTo(getListContainer());
+				$('<div class="fc-widget-header ' + headerClass + '"> <a class="add-event-from-day btn btn-mini btn-info" href="#add-event-from-day" data-day="' + seg.start.getTime() + '">add event</a> <'+dayHeaderElementType+' class="day-header" href="#day-header-click" data-day="' + seg.start.getTime() + '">' + seg.title + '</'+dayHeaderElementType+'></div>').appendTo(getListContainer());
 			}
 			segContainer = $('<div>').addClass('fc-list-section ' + contentClass).appendTo(getListContainer());
 			s = '';
@@ -220,17 +220,18 @@ function ListEventRenderer() {
 						"<div class='" + classes.join(' ') + "' data-event-id='"+event.id+"''>" +
 							"<div class='fc-event-inner fc-event-skin'>" +
 								"<div class='fc-event-head fc-event-skin'>" +
-									"<div class='fc-event-time'>" +
+									"<div class='fc-event-time muted'>" +
 										(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
 										(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
+										(event.editable ? '' : '<div class="readonly-badge"><i class="icon icon-lock"></i></div>') +
 									"</div>";
 
 								s += "</div>" +
 								"<div class='fc-event-content'>" +
 									"<div class='fc-event-icons'></div>" +
-									"<div class='fc-event-title'><h3>" +
+									"<div class='fc-event-title'>" +
 										htmlEscape(event.title) + //(event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
-									"</h3></div>" +
+									"</div>" +
 									"<div class='fc-event-location muted'>" +
 										(event.location_text ? htmlEscape(event.location_text) : '–') +
 									"</div>" +
@@ -305,8 +306,8 @@ function ListEventRenderer() {
 		}
 
 		if (!datestr && event.allDay) {
-			// timestr = opt('allDayText');
-			timestr = '';
+			timestr = opt('allDayText');
+			// timestr = '';
 		} else if ((duration < DAY_MS || !datestr) && !event.allDay) {
 			timestr = formatDates(event.start, event.end, timeFormat);
 		}
