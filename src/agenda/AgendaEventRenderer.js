@@ -38,7 +38,7 @@ function AgendaEventRenderer() {
 	var colContentRight = t.colContentRight;
 	var renderDaySegs = t.renderDaySegs;
 	var renderDaySegsSimplified = t.renderDaySegsSimplified;
-	// var renderEventMarkersDaySeg = t.renderEventMarkersDaySeg;
+	var renderEventMarkersDaySeg = t.renderEventMarkersDaySeg;
 	var resizableDayEvent = t.resizableDayEvent; // TODO: streamline binding architecture
 	var getColCnt = t.getColCnt;
 	var getColWidth = t.getColWidth;
@@ -297,7 +297,7 @@ function AgendaEventRenderer() {
               html += slotSegSimplifiedHtml(event, seg, classNames);
           }
           if (event) {
-          	existing = slotSegmentContainer.find('[data-event-id="'+event.id+'"]');
+          	existing = slotSegmentContainer.find('.fc-event-simplified[data-event-id="'+event.id+'"]');
           	if (existing.length === 0) {
 				eventElement = $(html).css('display', 'none').appendTo(slotSegmentContainer);
 				eventElement.slideDown("fast");
@@ -307,10 +307,6 @@ function AgendaEventRenderer() {
           	bindSlotSeg(event, eventElement, seg);
 	      }
           return;
-    }
-
-    function renderEventMarkersDaySeg () {
-    	console.warn('implement me!');
     }
 
     // Render events in a simplified manner in the 'time slots' at the bottom
@@ -370,7 +366,7 @@ function AgendaEventRenderer() {
               html += eventMarkerHtml(event, seg, classNames);
           }
           if (event) {
-          	existing = slotSegmentContainer.find('[data-event-id="'+event.id+'"]');
+          	existing = slotSegmentContainer.find('.fc-event-marker[data-event-id="'+event.id+'"]');
           	if (existing.length === 0) {
 				eventElement = $(html).appendTo(slotSegmentContainer);
           	} else {
@@ -522,8 +518,7 @@ function AgendaEventRenderer() {
 	}
 		
 	function eventMarkerHtml (event, seg, classNames) {
-		var verticalPosition = "top:" + seg.top + "px;";
-		var html = "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;"+verticalPosition+ "left:" + (seg.left) + "px;background:"+event.colors[0]+";'></a>";
+		var html = "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + seg.top + "px;left:" + (seg.left) + "px;background:"+event.colors[0]+";'></a>";
 		return html;
 	}
 

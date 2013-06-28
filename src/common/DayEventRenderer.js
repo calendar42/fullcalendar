@@ -2,13 +2,14 @@
 function DayEventRenderer() {
 	var t = this;
 
-	
+
 	// exports
 	t.renderDaySegs = renderDaySegs;
 	t.resizableDayEvent = resizableDayEvent;
 	t.renderDaySegsSimplified = renderDaySegsSimplified;
-	
-	
+	t.renderEventMarkersDaySeg = renderEventMarkersDaySeg;
+
+
 	// imports
 	var opt = t.opt;
 	var trigger = t.trigger;
@@ -40,12 +41,32 @@ function DayEventRenderer() {
 	
 	/* Rendering
 	-----------------------------------------------------------------------------*/
-	
+
+	function renderEventMarkersDaySeg(segs, classNames) {
+		var segmentContainer = getDaySegmentContainer();
+		segmentContainer.append(eventMarkersDaySegHtml(segs), classNames);
+	}
+
+	function eventMarkersDaySegHtml (segs, classNames) {
+		var html = '';
+		var segCnt = segs.length;
+		var seg, event, leftCol, left;
+
+		for (i=0; i<segCnt; i++) {
+			seg = segs[i];
+			event = seg.event;
+			leftCol = dayOfWeekCol(seg.start.getDay());
+			left = colContentLeft(leftCol);
+			html += "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;left:" + left + "px;background:"+event.colors[0]+";'></a>";
+		}
+		return html;
+	}
+
 	function renderDaySegsSimplified(segs, classNames) {
 		var segmentContainer = getDaySegmentContainer();
 		segmentContainer.append(daySegSimplifiedHTML(segs), classNames);
 	}
-	
+
     function daySegSimplifiedHTML(segs, classNames) {
     	var rtl = opt('isRTL');
     	var i;
