@@ -52,13 +52,26 @@ function DayEventRenderer() {
 		var segCnt = segs.length;
 		var popupplacement = 'bottom';
 		var top = 'auto';
-		var seg, event, leftCol, left;
+		var seg, event, leftCol, left, positions = {}, p;
 
 		for (i=0; i<segCnt; i++) {
 			seg = segs[i];
 			event = seg.event;
 			leftCol = dayOfWeekCol(seg.start.getDay());
 			left = colContentLeft(leftCol);
+			/**
+			* shift the marker to the right if there was already a marker in the same column
+			* By filling object with mapping of left position
+			* and if position was encountered before increase left and increment the position mapping
+			* is done with an object as the incoming events don't need to be sorted
+			*/
+			p = left;
+			if (positions[p]) {
+				left += 15*positions[p];
+				positions[p]++;
+			} else {
+				positions[p] = 1;
+			}
 			html += t.eventMarkerTemplate(event, top, left, popupplacement);
 		}
 		return html;
