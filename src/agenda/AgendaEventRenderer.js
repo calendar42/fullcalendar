@@ -518,7 +518,8 @@ function AgendaEventRenderer() {
 	}
 		
 	function eventMarkerHtml (event, seg, classNames) {
-		var html = "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + seg.top + "px;left:" + (seg.left) + "px;background:"+event.colors[0]+";'></a>";
+		var popupplacement = seg.top > 300 ? 'top' : 'bottom', // bootstrap tooltip placement
+		 	html = "<a class='fc-event-marker' href='#event-marker' data-placement='"+popupplacement+"' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + seg.top + "px;left:" + (seg.left) + "px;background:"+event.colors[0]+";'></a>";
 		return html;
 	}
 

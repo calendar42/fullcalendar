@@ -218,32 +218,8 @@ function ListEventRenderer() {
 
 					s +=
 						"<div class='" + classes.join(' ') + "' data-event-id='"+event.id+"''>" +
-							"<div class='fc-event-inner fc-event-skin'>" +
-								"<div class='fc-event-head fc-event-skin'>" +
-									"<div class='fc-event-time muted'>" +
-										(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
-										(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
-										(event.editable ? '' : '<div class="readonly-badge"><i class="icon icon-lock"></i></div>') +
-									"</div>";
-
-								s += "</div>" +
-								"<div class='fc-event-content'>" +
-									"<div class='fc-event-icons'></div>" +
-									"<div class='fc-event-title'>" +
-										htmlEscape(event.title) + //(event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
-									"</div>" +
-									"<div class='fc-event-location muted'>" +
-										(event.location_text ? htmlEscape(event.location_text) : '–') +
-									"</div>" +
-								"</div>" +
-								"<div class='fc-event-bg'></div>";
-								s += '<div class="event-colors">';
-								if (event.colors) {
-									for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
-										s += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
-									}
-								}
-								s += '</div>';
+							"<div class='fc-event-inner fc-event-skin'>";
+							s += t.listItemTemplate(event, times);
 							s += "</div>" + // close inner
 						"</div>";  // close outer
 				}
@@ -345,6 +321,7 @@ function ListView(element, calendar) {
 	t.render = render;
 	t.select = dummy;
 	t.unselect = dummy;
+	t.listItemTemplate = listItemTemplate;
 	t.getDaySegmentContainer = function(){ return body; };
 
 	// imports
@@ -360,6 +337,9 @@ function ListView(element, calendar) {
 	// overrides
 	t.setWidth = setWidth;
 	t.setHeight = setHeight;
+	if (opt('listItemTemplate')) {
+		t.listItemTemplate = opt('listItemTemplate');
+	}
 
 	// locals
 	var body;
@@ -409,6 +389,34 @@ function ListView(element, calendar) {
 		colFormat = opt('columnFormat', 'day');
 	}
 
+	function listItemTemplate(event, times) {
+		var html = "<div class='fc-event-head fc-event-skin'>" +
+					"<div class='fc-event-time muted'>" +
+						(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
+						(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
+						(event.editable ? '' : '<div class="readonly-badge"><i class="icon icon-lock"></i></div>') +
+					"</div>";
+
+				html += "</div>" +
+				"<div class='fc-event-content'>" +
+					"<div class='fc-event-icons'></div>" +
+					"<div class='fc-event-title'>" +
+						htmlEscape(event.title) + //(event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
+					"</div>" +
+					"<div class='fc-event-location muted'>" +
+						(event.location_text ? htmlEscape(event.location_text) : '–') +
+					"</div>" +
+				"</div>" +
+				"<div class='fc-event-bg'></div>";
+				html += '<div class="event-colors">';
+				if (event.colors) {
+					for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
+						html += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
+					}
+				}
+				html += '</div>';
+		return html;
+	}
 
 	function buildSkeleton() {
 		body = $('<div>').addClass('fc-list-content').appendTo(element);

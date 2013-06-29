@@ -57,7 +57,7 @@ function DayEventRenderer() {
 			event = seg.event;
 			leftCol = dayOfWeekCol(seg.start.getDay());
 			left = colContentLeft(leftCol);
-			html += "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;left:" + left + "px;background:"+event.colors[0]+";'></a>";
+			html += "<a class='fc-event-marker' href='#event-marker' data-placement='bottom' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;left:" + left + "px;background:"+event.colors[0]+";'></a>";
 		}
 		return html;
 	}
