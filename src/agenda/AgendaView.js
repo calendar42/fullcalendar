@@ -60,8 +60,9 @@ function AgendaView(element, calendar, viewName) {
 	t.reportDayClick = reportDayClick; // selection mousedown hack
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
-	
-	
+	t.eventMarkerTemplate = eventMarkerTemplate;
+
+
 	// imports
 	View.call(t, element, calendar, viewName);
 	OverlayManager.call(t);
@@ -78,8 +79,12 @@ function AgendaView(element, calendar, viewName) {
 	var daySelectionDblClick = t.daySelectionDblClick;
 	var slotSegHtml = t.slotSegHtml;
 	var formatDate = calendar.formatDate;
-	
-	
+
+	// overrides
+	if (opt('eventMarkerTemplate')) {
+		t.eventMarkerTemplate = opt('eventMarkerTemplate');
+	}
+
 	// locals
 	
 	var dayTable;
@@ -310,6 +315,9 @@ function AgendaView(element, calendar, viewName) {
 		axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 	}
 	
+	function eventMarkerTemplate(event, top, left, popupplacement) {
+		return "<a class='fc-event-marker' href='#event-marker' data-placement='"+popupplacement+"' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + top + "px;left:" + left + "px;background:"+event.colors[0]+";'></a>";
+	}
 	
 	
 	function updateCells() {

@@ -8,7 +8,6 @@ function AgendaWeekView(element, calendar) {
 	// exports
 	t.render = render;
 	
-	
 	// imports
 	AgendaView.call(t, element, calendar, 'agendaWeek');
 	var opt = t.opt;

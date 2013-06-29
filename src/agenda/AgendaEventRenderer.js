@@ -54,6 +54,7 @@ function AgendaEventRenderer() {
 	var calendar = t.calendar;
 	var formatDate = calendar.formatDate;
 	var formatDates = calendar.formatDates;
+	var eventMarkerTemplate = t.eventMarkerTemplate;
 	var timeLineInterval;
 	var isDragging;
 	
@@ -519,7 +520,9 @@ function AgendaEventRenderer() {
 		
 	function eventMarkerHtml (event, seg, classNames) {
 		var popupplacement = seg.top > 300 ? 'top' : 'bottom', // bootstrap tooltip placement
-		 	html = "<a class='fc-event-marker' href='#event-marker' data-placement='"+popupplacement+"' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + seg.top + "px;left:" + (seg.left) + "px;background:"+event.colors[0]+";'></a>";
+			left = seg.left,
+			top = seg.top,
+		 	html = t.eventMarkerTemplate(event, top, left, popupplacement);
 		return html;
 	}
 

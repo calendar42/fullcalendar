@@ -36,9 +36,9 @@ function DayEventRenderer() {
 	var renderDayOverlay = t.renderDayOverlay;
 	var clearOverlays = t.clearOverlays;
 	var clearSelection = t.clearSelection;
-	
-	
-	
+	var eventMarkerTemplate = t.eventMarkerTemplate;
+
+
 	/* Rendering
 	-----------------------------------------------------------------------------*/
 
@@ -50,6 +50,8 @@ function DayEventRenderer() {
 	function eventMarkersDaySegHtml (segs, classNames) {
 		var html = '';
 		var segCnt = segs.length;
+		var popupplacement = 'bottom';
+		var top = 'auto';
 		var seg, event, leftCol, left;
 
 		for (i=0; i<segCnt; i++) {
@@ -57,7 +59,7 @@ function DayEventRenderer() {
 			event = seg.event;
 			leftCol = dayOfWeekCol(seg.start.getDay());
 			left = colContentLeft(leftCol);
-			html += "<a class='fc-event-marker' href='#event-marker' data-placement='bottom' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;left:" + left + "px;background:"+event.colors[0]+";'></a>";
+			html += t.eventMarkerTemplate(event, top, left, popupplacement);
 		}
 		return html;
 	}
