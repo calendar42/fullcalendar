@@ -50,10 +50,9 @@ function DayEventRenderer() {
 	function eventMarkersDaySegHtml (segs, classNames) {
 		var html = '';
 		var segCnt = segs.length;
-		var popupplacement = 'bottom';
 		var top = 'auto';
 		var availWidth = t.getDaySegmentContainer().outerWidth();
-		var seg, event, leftCol, left, positions = {}, p;
+		var seg, event, leftCol, left, positions = {}, popupplacement,  p;
 
 		for (i=0; i<segCnt; i++) {
 			seg = segs[i];
@@ -73,6 +72,7 @@ function DayEventRenderer() {
 			} else {
 				positions[p] = 1;
 			}
+			popupplacement = 'bottom';
 			// extra popup-placement logic, best place? or can we moe this to bootstrap on the moment we actually place the popup
 			if (left < 120) {
 				popupplacement += '-right';
