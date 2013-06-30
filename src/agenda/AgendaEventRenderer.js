@@ -519,17 +519,10 @@ function AgendaEventRenderer() {
 	}
 		
 	function eventMarkerHtml (event, seg, classNames) {
-		var popupplacement = seg.top > 300 ? 'top' : 'bottom', // bootstrap tooltip placement
-			left = seg.left,
+		var left = seg.left,
 			top = seg.top;
-		// extra popup-placement logic, best place? or can we moe this to bootstrap on the moment we actually place the popup
-		if (left < 120) {
-			popupplacement += '-right';
-		} else if (t.getSlotSegmentContainer().outerWidth() - left < 120) {
-			popupplacement += '-left';
-		}
 		 	
-		return t.eventMarkerTemplate(event, top, left, popupplacement);;
+		return t.eventMarkerTemplate(event, top, left);;
 	}
 
 	function slotSegSimplifiedHtml (event, seg, classNames) {

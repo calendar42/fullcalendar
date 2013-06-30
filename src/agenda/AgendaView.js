@@ -315,8 +315,8 @@ function AgendaView(element, calendar, viewName) {
 		axisFirstCells = axisFirstCells.add(slotTable.find('th:first'));
 	}
 	
-	function eventMarkerTemplate(event, top, left, popupplacement) {
-		return "<a class='fc-event-marker' href='#event-marker' data-placement='"+popupplacement+"' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + top + "px;left:" + left + "px;background:"+event.colors[0]+";'></a>";
+	function eventMarkerTemplate(event, top, left) {
+		return "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + top + "px;left:" + left + "px;background:"+event.colors[0]+";'></a>";
 	}
 	
 	
