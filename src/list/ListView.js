@@ -45,14 +45,39 @@ function ListEventRenderer() {
 	}
 
 	function renderEventMarkers(events) {
-		var listContainer = getListContainer();
+		var listContainer = getListContainer(),
+			availWidth = listContainer.outerWidth(),
+			positions = {},
+			event, day, dayHeader, p, left, top, html;
+
 		listContainer.find('.fc-event-marker').remove();
+
 		for (i=0; i < events.length; i++) {
-			renderEventMarker(events[i]);
+			event = events[i];
+			day = clearTime(cloneDate(event.start));
+			dayHeader = listContainer.find('.fc-widget-header[data-day="'+day.getTime()+'"]');
+			p = day;
+			// Let's not mind the magic numbers for now
+			left = 20;
+			top = 35;
+			if (positions[p]) {
+				left += 15*positions[p];
+				if (left > availWidth - 20) {
+					top += 10;
+					left -= availWidth;
+					left += 30;
+				}
+				positions[p]++;
+			} else {
+				positions[p] = 1;
+			}
+			// same as template now
+			html = "<a class='fc-event-marker' href='#event-marker' data-event-id='" + event.id + "' style=display:block;position:absolute;z-index:8;top:" + top + "px;left:" + left + "px;background:"+event.colors[0]+";'><i class='icon icon-bullhorn'></i></a>";
+			dayHeader.append(html);
 		}
 	}
 
-	function renderEventMarker(event) {
+	function renderEventBar(event) {
 		var day = clearTime(cloneDate(event.start));
 		var listContainer = getListContainer();
 		var dayHeader = listContainer.find('.day-header[data-day="'+day.getTime()+'"]');
@@ -185,7 +210,7 @@ function ListEventRenderer() {
 			}
 
 			if (seg.title) {
-				$('<div class="fc-widget-header ' + headerClass + '"> <a class="add-event-from-day btn btn-mini btn-info" href="#add-event-from-day" data-day="' + seg.start.getTime() + '">add event</a> <'+dayHeaderElementType+' class="day-header" href="#day-header-click" data-day="' + seg.start.getTime() + '">' + seg.title + '</'+dayHeaderElementType+'></div>').appendTo(getListContainer());
+				$('<div class="fc-widget-header ' + headerClass + '" data-day="' + seg.start.getTime() + '"> <a class="add-event-from-day btn btn-mini btn-info" href="#add-event-from-day" data-day="' + seg.start.getTime() + '">add event</a> <'+dayHeaderElementType+' class="day-header" href="#day-header-click" data-day="' + seg.start.getTime() + '">' + seg.title + '</'+dayHeaderElementType+'></div>').appendTo(getListContainer());
 			}
 			segContainer = $('<div>').addClass('fc-list-section ' + contentClass).appendTo(getListContainer());
 			s = '';
