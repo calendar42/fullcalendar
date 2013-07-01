@@ -35,7 +35,9 @@ function ListEventRenderer() {
 
 	function clearEvents() {
 		reportEventClear();
-		getListContainer().empty();
+		if (getListContainer()) {
+			getListContainer().empty();
+		}
 	}
 
 	function renderEvents(events, modifiedEventId) {
