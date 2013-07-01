@@ -314,7 +314,6 @@ function AgendaEventRenderer() {
     function renderEventMarkersSlotSeg (segs, classNames) {
         var i, segCnt=segs.length, seg,
     		event,
-    		eventElement,
     		top, bottom,
     		colI, levelI, forward,
     		leftmost,
@@ -328,6 +327,7 @@ function AgendaEventRenderer() {
     		existing,
     		lastVerticalPosition, shifts = 0,
     		positions = {},
+    		events = {},
     		p;
 
     	if (rtl = opt('isRTL')) {
@@ -338,43 +338,39 @@ function AgendaEventRenderer() {
     		dit = 0;
     	}
         
-          for (i=0; i<segCnt; i++) {
-              seg = segs[i];
-              event = seg.event;
-              seg.top = timePosition(seg.start, seg.start);
-              colI = seg.col;
-              levelI = seg.level;
-              forward = seg.forward || 0;
-              leftmost = colContentLeft(colI*dis + dit);
-              seg.outerWidth = 2;
-              seg.outerHeight = Math.abs(seg.bottom - seg.top);
-              seg.left = leftmost;
+        for (i=0; i<segCnt; i++) {
+			seg = segs[i];
+			event = seg.event;
+			// only render once per event
+			if (!events[event.id]) {
+				events[event.id] = true;
+				seg.top = timePosition(seg.start, seg.start);
+				colI = seg.col;
+				levelI = seg.level;
+				forward = seg.forward || 0;
+				leftmost = colContentLeft(colI*dis + dit);
+				seg.outerWidth = 2;
+				seg.outerHeight = Math.abs(seg.bottom - seg.top);
+				seg.left = leftmost;
 
-              /**
-              * shift the marker to the right if there was already a marker on about the same height
-              * By filling object with mapping of left position and rounded top-position
-              * and if position was encountered before increase seg.left and increment the position mapping
-              * is done with an object as the incoming events don't need to be sorted
-              */
-              p = seg.left+'_'+Math.round(seg.top/10)*10;
-              if (positions[p]) {
-              	seg.left += 15*positions[p];
-              	positions[p]++;
-              } else {
-              	positions[p] = 1;
-              }
-
-              html += eventMarkerHtml(event, seg, classNames);
-          }
-          if (event) {
-          	existing = slotSegmentContainer.find('.fc-event-marker[data-event-id="'+event.id+'"]');
-          	if (existing.length === 0) {
-				eventElement = $(html).appendTo(slotSegmentContainer);
-          	} else {
-          		eventElement = $(html).replaceAll(existing);
-          	}
-	      }
-          return;
+				/**
+				* shift the marker to the right if there was already a marker on about the same height
+				* By filling object with mapping of left position and rounded top-position
+				* and if position was encountered before increase seg.left and increment the position mapping
+				* is done with an object as the incoming events don't need to be sorted
+				*/
+				p = seg.left+'_'+Math.round(seg.top/10)*10;
+				if (positions[p]) {
+					seg.left += 15*positions[p];
+					positions[p]++;
+				} else {
+					positions[p] = 1;
+				}
+				html += eventMarkerHtml(event, seg, classNames);
+			}
+        }
+		$(html).appendTo(slotSegmentContainer);
+        return;
     }
 	
 	// renders events in the 'time slots' at the bottom
