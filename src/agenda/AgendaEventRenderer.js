@@ -533,7 +533,7 @@ function AgendaEventRenderer() {
         var defaultClasses = ['fc-event', 'fc-event-skin', 'fc-event-vert', 'fc-event-simplified'];
         var classes = classNames ? defaultClasses.concat(classNames) : defaultClasses;
         var verticalPosition = event.fromBottom ? "bottom:" + (seg.bottom) + "px;" : "top:" + seg.top + "px;";
-	    var html = "<div data-event-id='" + event.id + "' style='position:absolute;z-index:8; width: " + daycolWidth + "px ;" + verticalPosition + "left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "' class='" + classes.join(' ') + "'>"+
+	    var html = "<div data-event-id='" + event.id + "' style='position:absolute;z-index:9; width: " + daycolWidth + "px ;" + verticalPosition + "left:" + (seg.left - 2) + "px;height:" + seg.outerHeight + "px;" + skinCss + "' class='" + classes.join(' ') + "'>"+
 	    (event.title ? htmlEscape(event.title) : "") +
 	    " </div>";
 	    

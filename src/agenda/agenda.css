@@ -184,5 +184,5 @@ a.day-header {
 	padding: 0;
 	border: none;
 	border-top: 2px solid #3ec400;
-	z-index: 999;
+	z-index: 8;
 }

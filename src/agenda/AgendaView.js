@@ -238,7 +238,7 @@ function AgendaView(element, calendar, viewName) {
 		if (opt('allDaySlot')) {
 		
 			daySegmentContainer =
-				$("<div style='position:absolute;z-index:8;top:0;left:0'/>")
+				$("<div style='position:absolute;z-index:9;top:0;left:0'/>")
 					.appendTo(slotLayer);
 		
 			s =
