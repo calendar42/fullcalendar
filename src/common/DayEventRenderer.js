@@ -50,9 +50,8 @@ function DayEventRenderer() {
 	function eventMarkersDaySegHtml (segs, classNames) {
 		var html = '';
 		var segCnt = segs.length;
-		var top = 'auto';
 		var availWidth = t.getDaySegmentContainer().outerWidth();
-		var seg, event, leftCol, left, events = {}, positions = {},  p;
+		var seg, event, leftCol, leftmost, rightmost, events = {}, positions = {},  p, rowOfCol = {};
 
 		for (i=0; i<segCnt; i++) {
 			seg = segs[i];
@@ -61,21 +60,38 @@ function DayEventRenderer() {
 			if (!events[event.id]) {
 				events[event.id] = true;
 				leftCol = dayOfWeekCol(seg.start.getDay());
-				left = colContentLeft(leftCol);
+				leftmost = colContentLeft(leftCol);
+				rightmost = colContentRight(leftCol);
+				seg.top = 0;
+				seg.left = leftmost;
+				// keep track of row count per columns
+				if (!rowOfCol[leftCol]) {
+					rowOfCol[leftCol] = 0;
+				}
 				/**
 				* shift the marker to the right if there was already a marker in the same column
 				* By filling object with mapping of left position
 				* and if position was encountered before increase left and increment the position mapping
 				* is done with an object as the incoming events don't need to be sorted
 				*/
-				p = left;
+				p = seg.left;
 				if (positions[p]) {
-					left += 15*positions[p];
+					seg.left += 15*positions[p];
 					positions[p]++;
 				} else {
 					positions[p] = 1;
 				}
-				html += t.eventMarkerTemplate(event, top, left);
+
+				// if the event has now be shifted more then the width of the column, we set it as first of a new row
+				if (seg.left > rightmost) {
+					seg.left = leftmost;
+					rowOfCol[leftCol]++;
+					positions[p] = 1;
+				}
+
+				seg.top += 10*rowOfCol[leftCol];
+
+				html += t.eventMarkerTemplate(event, seg.top, seg.left);
 			}
 		}
 		return html;
