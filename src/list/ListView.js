@@ -424,7 +424,6 @@ function ListView(element, calendar) {
 
 				html += "</div>" +
 				"<div class='fc-event-content'>" +
-					"<div class='fc-event-icons'></div>" +
 					"<div class='fc-event-title'>" +
 						htmlEscape(event.title) + //(event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
 					"</div>" +

@@ -606,8 +606,7 @@ function AgendaEventRenderer() {
 			"</div>" +
 			"<div class='fc-event-bg'></div>" +
 			"</div>" + // close inner
-			"<span class='event-badges'></span>" +
-			"<span class='event-icons'></span>";
+			"<span class='event-badges'></span>";
 		if (seg.isEnd && isEventResizable(event)) {
 			html +=
 				"<div class='ui-resizable-handle ui-resizable-s'>=</div>";
