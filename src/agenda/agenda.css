@@ -139,20 +139,6 @@ a.day-header {
 	font-size: 10px;
 	}
 	
-.fc-event-vert .fc-event-bg { /* makes the event lighter w/ a semi-transparent overlay  */
-	position: absolute;
-	z-index: 1;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	}
-	
-.fc .ui-draggable-dragging .fc-event-bg, /* TODO: something nicer like .fc-opacity */
-.fc-select-helper .fc-event-bg {
-	display: none\9; /* for IE6/7/8. nested opacity filters while dragging don't work */
-	}
-	
 /* resizable */
 	
 .fc-event-vert .ui-resizable-s {

@@ -604,7 +604,6 @@ function AgendaEventRenderer() {
 			"<span class='event-title-txt'>" + htmlEscape(event.title) + " </span>" +
 			"</div>" +
 			"</div>" +
-			"<div class='fc-event-bg'></div>" +
 			"</div>" + // close inner
 			"<span class='event-badges'></span>";
 		if (seg.isEnd && isEventResizable(event)) {
