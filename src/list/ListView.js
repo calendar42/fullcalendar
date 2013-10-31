@@ -424,15 +424,13 @@ function ListView(element, calendar) {
 
 				html += "</div>" +
 				"<div class='fc-event-content'>" +
-					"<div class='fc-event-icons'></div>" +
 					"<div class='fc-event-title'>" +
 						htmlEscape(event.title) + //(event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
 					"</div>" +
 					"<div class='fc-event-location muted'>" +
 						(event.location_text ? htmlEscape(event.location_text) : '–') +
 					"</div>" +
-				"</div>" +
-				"<div class='fc-event-bg'></div>";
+				"</div>";
 				html += '<div class="event-colors">';
 				if (event.colors) {
 					for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {

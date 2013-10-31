@@ -318,6 +318,7 @@ function AgendaEventRenderer() {
             top, bottom,
             colI, levelI, forward,
             leftmost,
+    		rightMost,
             outerWidth,
             left,
             html='',
@@ -326,8 +327,9 @@ function AgendaEventRenderer() {
             colCnt = getColCnt(),
             overlapping = colCnt > 1,
             existing,
-            lastVerticalPosition, shifts = 0,
+            row = 0,
             positions = {},
+            rowOfCol = {},
             events = {},
             p;
 
@@ -351,9 +353,14 @@ function AgendaEventRenderer() {
                 levelI = seg.level;
                 forward = seg.forward || 0;
                 leftmost = colContentLeft(colI*dis + dit);
+				rightmost = colContentRight(colI*dis + dit);
                 seg.outerWidth = 2;
                 seg.outerHeight = Math.abs(seg.bottom - seg.top);
                 seg.left = leftmost;
+				// keep track of row count per columns
+				if (!rowOfCol[colI]) {
+					rowOfCol[colI] = 0;
+				}
 
                 /**
                 * shift the marker to the right if there was already a marker on about the same height
@@ -368,6 +375,16 @@ function AgendaEventRenderer() {
                 } else {
                     positions[p] = 1;
                 }
+
+				// if the event has now be shifted more then the width of the column, we set it as first of a new row
+				if (seg.left > rightmost) {
+					seg.left = leftmost;
+					rowOfCol[colI]++;
+					positions[p] = 1;	
+				}
+
+				seg.top += 10*rowOfCol[colI];
+
                 html += eventMarkerHtml(event, seg, classNames);
             }
         }
@@ -627,15 +644,12 @@ function AgendaEventRenderer() {
             "<span class='event-title-txt'>" + htmlEscape(event.title) + " </span>" +
             "</div>" +
             "</div>" +
-            "<div class='fc-event-bg'></div>" +
             "</div>" + // close inner
-            "<span class='event-badges'></span>" +
-            "<span class='event-icons'></span>";
+			"<span class='event-badges'></span>";
         if (seg.isEnd && isEventResizable(event)) {
             html +=
                 "<div class='ui-resizable-handle ui-resizable-s'>=</div>";
         }
-
         html +=
             "</" + (url ? "a" : "div") + ">";
         return html;
@@ -979,6 +993,7 @@ function AgendaEventRenderer() {
         });
     }
     
+
 
 }
 
