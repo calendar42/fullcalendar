@@ -580,7 +580,7 @@ function AgendaEventRenderer() {
             }
 
             html = "<div class='trip-click trip-wrapper' data-event-id='" + trip.id + "' style='position:absolute; " + positionFrom + ": -" + wrapperHeight + "px; height: " + wrapperHeight + "px; background: #CCC; width: 100%;'>" +
-                        "<div class='trip-click trip-" + type + "' style='position:absolute; " + positionFrom + ": 0px; height: " + height + "px; background: #CCCC00; width: 100%;'>" + htmlEscape(trip.title) + "</div>" +
+                        "<div class='trip-" + type + "' style='position:absolute; " + positionFrom + ": 0px; height: " + height + "px; background: #CCCC00; width: 100%;'>" + htmlEscape(trip.title) + "</div>" +
                     "</div>";
         }
 
