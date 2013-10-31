@@ -570,6 +570,7 @@ function AgendaEventRenderer() {
             var top         = timePosition(trip.start, trip.start);
             var bottom      = timePosition(trip.start, trip.end);
             var buffer      = timePosition(trip.end, new Date(trip.end.getTime() + (trip.timeBuffer * 1000))) - bottom;
+            var borderColor = event.borderColor || event.color;
             var height      = bottom - top;
             var positionFrom    = 'top';
             var wrapperHeight   = 0;
@@ -579,8 +580,8 @@ function AgendaEventRenderer() {
                 positionFrom = 'bottom';
             }
 
-            html = "<div class='trip-click trip-wrapper' data-event-id='" + trip.id + "' style='position:absolute; " + positionFrom + ": -" + wrapperHeight + "px; height: " + wrapperHeight + "px; background: #CCC; width: 100%;'>" +
-                        "<div class='trip-" + type + "' style='position:absolute; " + positionFrom + ": 0px; height: " + height + "px; background: #CCCC00; width: 100%;'>" + htmlEscape(trip.title) + "</div>" +
+            html = "<div class='trip-click trip-wrapper trip-" + type +"' data-event-id='" + trip.id + "' style='position:absolute; " + positionFrom + ": -" + wrapperHeight + "px; height: " + wrapperHeight + "px; background: #CCC; width: 100%;'>" +
+                        "<div class='trip-inner' style='position:absolute; " + positionFrom + ": 0px; height: " + height + "px; background: " + borderColor + "; color: " + borderColor + "; width: 100%;'>" + htmlEscape(trip.title) + "</div>" +
                     "</div>";
         }
 
