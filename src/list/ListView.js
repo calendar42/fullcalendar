@@ -414,8 +414,31 @@ function ListView(element, calendar) {
 		colFormat = opt('columnFormat', 'day');
 	}
 
+    function tripHtml(event, type) {
+        var html = '';
+        var trip = null;
+
+        if (!_u.def(event.trips) || !_u.def(event.trips[type])) {
+            return html;
+        }
+
+        trip = event.trips[type];
+
+        if (trip) {
+            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>" +
+                        "<div class='trip-inner'>" + htmlEscape(trip.title) + "</div>" +
+                    "</div>";
+        }
+
+        return html;
+    }
+
 	function listItemTemplate(event, times) {
-		var html = "<div class='fc-event-head fc-event-skin'>" +
+		var html = '';
+
+		html += tripHtml(event, 'to');
+
+		html += "<div class='fc-event-head fc-event-skin'>" +
 					"<div class='fc-event-time muted'>" +
 						(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
 						(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
@@ -438,6 +461,9 @@ function ListView(element, calendar) {
 					}
 				}
 				html += '</div>';
+
+		html += tripHtml(event, 'from');
+
 		return html;
 	}
 
