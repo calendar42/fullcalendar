@@ -580,8 +580,8 @@ function AgendaEventRenderer() {
                 positionFrom = 'bottom';
             }
 
-            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "' style='position:absolute; " + positionFrom + ": -" + wrapperHeight + "px; height: " + wrapperHeight + "px; background: #CCC; width: 100%;'>" +
-                        "<div class='trip-inner' style='position:absolute; " + positionFrom + ": 0px; height: " + height + "px; background: " + borderColor + "; color: " + borderColor + "; width: 100%;'>" + htmlEscape(trip.title) + "</div>" +
+            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "' style='position:absolute; " + positionFrom + ": -" + wrapperHeight + "px; height: " + wrapperHeight + "px; background: rgba(220, 220, 220, 0.8); width: 100%;'>" +
+                        "<div class='trip-inner' style='position:absolute; " + positionFrom + ": 0px; height: " + height + "px; background: " + borderColor + "; color: " + borderColor + "; width: 100%;'><span>" + htmlEscape(trip.title) + "</span></div>" +
                     "</div>";
         }
 
