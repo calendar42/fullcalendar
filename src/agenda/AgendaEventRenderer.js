@@ -569,11 +569,19 @@ function AgendaEventRenderer() {
         if (trip) {
             var top         = timePosition(trip.start, trip.start);
             var bottom      = timePosition(trip.start, trip.end);
-            var buffer      = timePosition(trip.end, new Date(trip.end.getTime() + (trip.timeBuffer * 1000))) - bottom;
+            var buffer      = 0;
             var borderColor = event.borderColor || event.color;
             var height      = bottom - top;
             var positionFrom    = 'top';
             var wrapperHeight   = 0;
+
+            if (typeof trip.timeBuffer === 'number') {
+                var startWithBuffer = cloneDate(trip.start, true);
+                startWithBuffer.setSeconds(trip.timeBuffer);
+
+                buffer = timePosition(cloneDate(trip.start, true), startWithBuffer);
+            }
+
             wrapperHeight = height + buffer;
 
             if (type === 'from') {
