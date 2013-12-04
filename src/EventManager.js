@@ -259,15 +259,13 @@ function EventManager(options, _sources) {
 	function renderEvents(events, stick) {
         for (var i =0; i < events.length; i++) {
             var event = events[i];
-    		normalizeEvent(event);
-    		if (!event.source) {
-    			if (stick) {
-    				stickySource.events.push(event);
-    				event.source = stickySource;
-    			}
-    		}
-    		// always push event to cache (issue #1112:)
-    		cache.push(event);
+			normalizeEvent(event);
+			if (stick && stickySource.events.indexOf(event) === -1) {
+				stickySource.events.push(event);
+				event.source = stickySource;
+			}
+			// always push event to cache (issue #1112:)
+			cache.push(event);
         }
 		reportEvents(cache);
 	}
