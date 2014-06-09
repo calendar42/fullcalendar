@@ -738,6 +738,8 @@ function AgendaEventRenderer() {
     function draggableDayEvent(event, eventElement, isStart) {
         var origWidth;
         var origHeight;
+        var origColDragStart; // the column number on which we've started dragging
+        var origEventStartColumn; // the column that the eventElemtn originally started on
         var revert;
         var allDay=true;
         var dayDelta;
@@ -769,6 +771,12 @@ function AgendaEventRenderer() {
                     if (cell) {
                         //setOverflowHidden(true);
                         revert = false;
+                        if (!origColDragStart) {
+                            origColDragStart = cell.col;
+                            // As the startcolumn of an event is not present in fullCalendar, we need to calculate the day difference between the start and the clicked date our selves and derive the startcolumn from that
+                            origEventStartColumn = origColDragStart - dayDiff(t.colDate(cell.col), event.start);
+                            origEventStartColumn = origEventStartColumn < 0 ? 0 : origEventStartColumn; // if the difference is bigger then the amount of colmuns, it starts at 0;
+                        }
                         dayDelta = colDelta * dis;
                         lastHoveredCell = cell;
                         if (!cell.row) {
@@ -803,7 +811,18 @@ function AgendaEventRenderer() {
                 }, ev, 'drag');
             },
             drag: function (ev, ui) {
-                // console.warn(ev, ui);
+                /* 
+                 * These are some calculations to offset the helper correctly when dragging a multi-allday event onto the grid
+                 * This is needed as jQuery draggable calculates its internal drag-grid relative to the top-left of the dragged element
+                 * If you then start dragging a multiday all-day event its helper will be misaligned by the difference between the start column of the event and the column that you started dragging in
+                 */
+                if (allDay) {
+                    return;
+                }
+                var colOffset = origColDragStart - origEventStartColumn;
+                if (colOffset > 0) {
+                    ui.position.left += colOffset * colWidth;
+                }
             },
             stop: function(ev, ui) {
                 hoverListener.stop();
@@ -840,6 +859,8 @@ function AgendaEventRenderer() {
                 trigger('eventDragStop', eventElement, event, ev, ui);
                 isDragging = false;
                 lastHoveredCell = null;
+                origColDragStart = null;
+                origDragDayDiff = null;
                 //setOverflowHidden(false);
             }
         });
