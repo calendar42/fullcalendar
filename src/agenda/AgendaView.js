@@ -35,6 +35,7 @@ function AgendaView(element, calendar, viewName) {
 	t.timePosition = timePosition;
 	t.timePositionBottom = timePositionBottom;
 	t.dayOfWeekCol = dayOfWeekCol;
+	t.colDate = colDate;
 	t.dateCell = dateCell;
 	t.cellDate = cellDate;
 	t.cellIsAllDay = cellIsAllDay;

@@ -40,6 +40,7 @@ function AgendaEventRenderer() {
     var renderDaySegsSimplified = t.renderDaySegsSimplified;
     var renderEventMarkersDaySeg = t.renderEventMarkersDaySeg;
     var resizableDayEvent = t.resizableDayEvent; // TODO: streamline binding architecture
+    var colDate = t.colDate;
     var getColCnt = t.getColCnt;
     var getColWidth = t.getColWidth;
     var getSlotHeight = t.getSlotHeight;
@@ -748,6 +749,8 @@ function AgendaEventRenderer() {
     function draggableDayEvent(event, eventElement, isStart) {
         var origWidth;
         var origHeight;
+        var origColDragStart; // the column number on which we've started dragging
+        var origEventStartColumn; // the column that the eventElemtn originally started on
         var revert;
         var allDay=true;
         var dayDelta;
@@ -756,6 +759,7 @@ function AgendaEventRenderer() {
         var colWidth = getColWidth();
         var slotHeight = getSlotHeight();
         var minMinute = getMinMinute();
+        var lastHoveredCell;
         var helperElement;
         eventElement.draggable({
             helper: 'clone',
@@ -778,7 +782,14 @@ function AgendaEventRenderer() {
                     if (cell) {
                         //setOverflowHidden(true);
                         revert = false;
+                        if (!origColDragStart) {
+                            origColDragStart = cell.col;
+                            // As the startcolumn of an event is not present in fullCalendar, we need to calculate the day difference between the start and the clicked date our selves and derive the startcolumn from that
+                            origEventStartColumn = origColDragStart - dayDiff(t.colDate(cell.col), event.start);
+                            origEventStartColumn = origEventStartColumn < 0 ? 0 : origEventStartColumn; // if the difference is bigger then the amount of colmuns, it starts at 0;
+                        }
                         dayDelta = colDelta * dis;
+                        lastHoveredCell = cell;
                         if (!cell.row) {
                             // on full-days
                             renderDayOverlay(
@@ -788,21 +799,17 @@ function AgendaEventRenderer() {
                             resetElement();
                         }else{
                             // mouse is over bottom slots
-                            if (isStart) {
-                                if (allDay) {
-                                    // convert event to temporary slot-event
-                                    helperElement.width(colWidth - 10); // don't use entire width
-                                    setOuterHeight(
-                                        helperElement,
-                                        slotHeight * Math.round(
-                                            (event.end && event.end.getHours() !== 0 ? ((event.end - event.start) / MINUTE_MS) : opt('defaultEventMinutes')) / opt('slotMinutes')
-                                        )
-                                    );
-                                    eventElement.draggable('option', 'grid', [colWidth, 1]);
-                                    allDay = false;
-                                }
-                            }else{
-                                revert = true;
+                            if (allDay) {
+                                // convert event to temporary slot-event
+                                helperElement.width(colWidth - 10); // don't use entire width
+                                setOuterHeight(
+                                    helperElement,
+                                    slotHeight * Math.round(
+                                        (event.end && event.end.getHours() !== 0 ? ((event.end - event.start) / MINUTE_MS) : opt('defaultEventMinutes')) / opt('slotMinutes')
+                                    )
+                                );
+                                eventElement.draggable('option', 'grid', [colWidth, 1]);
+                                allDay = false;
                             }
                         }
                         revert = revert || (allDay && !dayDelta);
@@ -813,6 +820,20 @@ function AgendaEventRenderer() {
                     }
                     eventElement.draggable('option', 'revert', revert);
                 }, ev, 'drag');
+            },
+            drag: function (ev, ui) {
+                /* 
+                 * These are some calculations to offset the helper correctly when dragging a multi-allday event onto the grid
+                 * This is needed as jQuery draggable calculates its internal drag-grid relative to the top-left of the dragged element
+                 * If you then start dragging a multiday all-day event its helper will be misaligned by the difference between the start column of the event and the column that you started dragging in
+                 */
+                if (allDay) {
+                    return;
+                }
+                var colOffset = origColDragStart - origEventStartColumn;
+                if (colOffset > 0) {
+                    ui.position.left += colOffset * colWidth;
+                }
             },
             stop: function(ev, ui) {
                 hoverListener.stop();
@@ -826,17 +847,31 @@ function AgendaEventRenderer() {
                 }else{
                     // changed!
                     var minuteDelta = 0;
+                    // if it was an allday event, but no longer is, we will set the start and end manually
+                    // This will make sure that events that actually didn't start/ end on the droppped date will be start/end on there
+                    // These events transitioning away from all-day, will have a duration as set in opt('defaultEventMinutes')
                     if (!allDay) {
+                        var droppedDate = t.colDate(lastHoveredCell.col);
+
+                        event.start = droppedDate;
+                        event.end = addMinutes(cloneDate(droppedDate), opt('defaultEventMinutes'));
+
                         minuteDelta = Math.round((helperElement.offset().top - getBodyContent().offset().top) / slotHeight)
                             * opt('slotMinutes')
                             + minMinute
                             - (event.start.getHours() * 60 + event.start.getMinutes());
+
+                        // as we set the start and end date manually when transitioning from allDay to non-allDay we don't care about the dayDelta no more
+                        dayDelta = 0;
                     }
                     eventDrop(this, event, dayDelta, minuteDelta, allDay, ev, ui);
                 }
                 eventElement.css('display', ''); // show() was causing display=inline
                 trigger('eventDragStop', eventElement, event, ev, ui);
                 isDragging = false;
+                lastHoveredCell = null;
+                origColDragStart = null;
+                origDragDayDiff = null;
                 //setOverflowHidden(false);
             }
         });
