@@ -570,7 +570,6 @@ function AgendaEventRenderer() {
             var top         = timePosition(trip.start, trip.start);
             var bottom      = timePosition(trip.start, trip.end);
             var buffer      = 0;
-            var borderColor = event.borderColor || event.color;
             var height      = bottom - top;
             var positionFrom    = 'top';
             var wrapperHeight   = 0;
@@ -588,9 +587,21 @@ function AgendaEventRenderer() {
                 positionFrom = 'bottom';
             }
 
-            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "' style='position:absolute; " + positionFrom + ": -" + wrapperHeight + "px; height: " + wrapperHeight + "px; background: rgba(220, 220, 220, 0.8); width: 100%;'>" +
-                        "<div class='trip-inner' style='position:absolute; " + positionFrom + ": 0px; height: " + height + "px; background: " + borderColor + "; color: " + borderColor + "; width: 100%;'><span>" + htmlEscape(trip.title) + "</span></div>" +
-                    "</div>";
+            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "' style='position:absolute; " + positionFrom + ": -" + wrapperHeight + "px; height: " + wrapperHeight + "px;'>" +
+                        '<div class="trip-inner-wrapper">' +
+                            '<div class="trip-inner">' +
+                                '<div class="action-group">' +
+                                    '<a class="#accept-trip-suggestion"><i class="c42-icon c42-icon-checkmark"></i></a>' +
+                                    '<a class="#decline-trip-suggestion"><i class="c42-icon c42-icon-cross"></i></a>' +
+                                '</div>' +
+                                '<div class="title">' + htmlEscape(trip.title) + '</div>' +
+                                '<div class="sub-title">' + htmlEscape(trip.subTitle) + '</div>' +
+                            '</div>' +
+                        '</div>' +
+
+                        '<div class="trip-line"></div>' +
+                        (trip.icon ? '<div class="trip-icon"><i class="' + htmlEscape(trip.icon) + '"></i></div>' : '') +
+                    '</div>';
         }
 
         return html;
