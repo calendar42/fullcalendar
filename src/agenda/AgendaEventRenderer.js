@@ -588,7 +588,7 @@ function AgendaEventRenderer() {
                 positionFrom = 'bottom';
             }
 
-            html = '<div class="trip-click trip-wrapper trip-' + type + (trip.dirty ? ' trip-dirty ' : '') + (trip.selected ? ' trip-selected ' : '') +'" [data-event-id]="' + trip.id + '" style="position:absolute; ' + positionFrom + ': -' + wrapperHeight + 'px; height: ' + wrapperHeight + 'px;">' +
+            html = '<div class="trip-click trip-wrapper trip-' + type + (trip.dirty ? ' trip-dirty ' : '') + (trip.selected ? ' trip-selected ' : '') +'" data-event-id="' + trip.id + '" style="position:absolute; ' + positionFrom + ': -' + wrapperHeight + 'px; height: ' + wrapperHeight + 'px;">' +
                         '<div class="trip-line"></div>' +
                         (trip.icon ? '<div class="trip-icon" data-show-popover="Event" data-record-id="'+trip.id+'"><i class="' + htmlEscape(trip.icon) + '"></i></div>' : '') +
                     '</div>';
