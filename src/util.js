@@ -129,7 +129,9 @@ function lazySegBind(container, segs, bindHandlers) {
 			bindHandlers(seg.event, seg.element, seg);
 			$(ev.target).trigger(ev);
 		}
-		ev.stopPropagation();
+		// https://code.google.com/p/fullcalendar/issues/detail?id=936
+		// delegated mousenters didn't work because of this
+		// ev.stopPropagation();
 	});
 }
 
