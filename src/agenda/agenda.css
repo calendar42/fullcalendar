@@ -136,7 +136,8 @@ a.day-header {
 	
 .fc-event-vert .fc-event-time {
 	white-space: nowrap;
-	font-size: 10px;
+	font-size: 11px;
+	height: 18px;
 	}
 	
 /* resizable */

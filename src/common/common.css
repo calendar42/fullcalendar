@@ -191,7 +191,7 @@ a.fc-event {
 	}
 
 .fc-event-title {
-	line-height: 18px;
+	line-height: 16px;
 	}
 	
 .fc .ui-resizable-handle { /*** TODO: don't use ui-resizable anymore, change class ***/
@@ -205,11 +205,16 @@ a.fc-event {
 	
 	.fc-event-content {
 	margin: -4px 0 0 1px;
+	font-size: 11px !important;
 	}
 	
+	.event-title-txt{
+		font-weight: bold;
+	}
+
 	.fc-event-time {
 	font-size: 0.65em;
-	font-weight: bold;
+	
 	}
 	
 /* Horizontal Events
