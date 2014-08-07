@@ -568,7 +568,7 @@ function AgendaEventRenderer() {
         trip = event.trips[type];
 
         if (trip) {
-            var classNames  = '';
+            var classNames  = (trip.classNames ? trip.classNames : '');
             var container   = getBodyContent();
             var top         = timePosition(trip.start, trip.start);
             var bottom      = timePosition(trip.start, trip.end);
@@ -576,6 +576,7 @@ function AgendaEventRenderer() {
             var height      = bottom - top;
             var positionFrom    = 'top';
             var wrapperHeight   = 0;
+            var showPopover = (trip.showPopover === false ? false : true);
 
             if (typeof trip.timeBuffer === 'number') {
                 var startWithBuffer = cloneDate(trip.start, true);
@@ -592,21 +593,24 @@ function AgendaEventRenderer() {
                 positionFrom = 'bottom';
 
                 if ((seg.top + seg.outerHeight) >= container.height()) {
-                    classNames = 'trip-outside-bottom';
+                    classNames += ' trip-outside-bottom';
                 } else {
                     styleAttr += 'bottom: -' + wrapperHeight + 'px; height: ' + wrapperHeight + 'px;';
                 }
             } else {
                 if (seg.top <= 0) {
-                    classNames = 'trip-outside-top';
+                    classNames += ' trip-outside-top';
                 } else {
                     styleAttr += 'top: -' + wrapperHeight + 'px; height: ' + wrapperHeight + 'px;';
                 }
             }
 
+            var popoverHtmlAttr = (showPopover === true ? 'data-show-popover="Event" data-record-id="'+trip.id+'"' : '');
+
+
             html = '<div class="trip-click trip-wrapper ' + classNames + ' trip-' + type + (trip.dirty ? ' trip-dirty ' : '') + (trip.selected ? ' trip-selected ' : '') +'" data-event-id="' + trip.id + '" style="' + styleAttr + '">' +
                         '<div class="trip-line"></div>' +
-                        (trip.icon ? '<div class="trip-icon" data-show-popover="Event" data-record-id="'+trip.id+'"><i class="transport-mode-icon ' + htmlEscape(trip.icon) + '"></i></div>' : '') +
+                        (trip.icon ? '<div class="trip-icon" ' + popoverHtmlAttr + '><i class="transport-mode-icon ' + htmlEscape(trip.icon) + '"></i></div>' : '') +
                     '</div>';
         }
 
