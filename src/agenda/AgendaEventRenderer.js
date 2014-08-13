@@ -571,6 +571,7 @@ function AgendaEventRenderer() {
             var classNames      = (trip.classNames ? trip.classNames : '');
             var container       = getBodyContent();
             var positionFrom    = 'top';
+            var showPopover     = (trip.showPopover === false ? false : true);
 
             var top             = 0;
             var from            = 0;
