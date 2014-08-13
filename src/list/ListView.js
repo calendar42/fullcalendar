@@ -425,8 +425,17 @@ function ListView(element, calendar) {
         trip = event.trips[type];
 
         if (trip) {
-            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>" +
+        	var noType = (trip.type === 'to')?_('form'):_('to');
+        	//var type = _(trip.type);
+            /* html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>" +
                         "<div class='trip-inner'>" + htmlEscape(trip.title) + "</div>" +
+                    "</div>";*/
+            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>" +
+                        "<div class='trip-subTitle'>" + trip.subTitle + "</div>" +
+                        "<div class='modality-icon c42-icon c42-icon-medium "+trip.icon+"''></div>" +
+             			"<div class='trip-inner'>" + C42.utils.createShortReadableDurationFromMilliSeconds(trip.end - trip.start) + " " +
+                        "" +noType+" "+trip.title +"</div>" +
+                        // "" +type+" "+event.location_text +"</div>" +
                     "</div>";
         }
 

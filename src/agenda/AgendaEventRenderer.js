@@ -568,7 +568,7 @@ function AgendaEventRenderer() {
         trip = event.trips[type];
 
         if (trip) {
-            var classNames      = '';
+            var classNames      = (trip.classNames ? trip.classNames : '');
             var container       = getBodyContent();
             var positionFrom    = 'top';
 
@@ -592,21 +592,24 @@ function AgendaEventRenderer() {
                 positionFrom = 'bottom';
 
                 if ((seg.top + seg.outerHeight) >= container.height()) {
-                    classNames = 'trip-outside-bottom';
+                    classNames += ' trip-outside-bottom';
                 } else {
                     styleAttr += 'bottom: -' + height + 'px; height: ' + height + 'px;';
                 }
             } else {
                 if (seg.top <= 0) {
-                    classNames = 'trip-outside-top';
+                    classNames += ' trip-outside-top';
                 } else {
                     styleAttr += 'top: -' + height + 'px; height: ' + height + 'px;';
                 }
             }
 
+            var popoverHtmlAttr = (showPopover === true ? 'data-show-popover="Event" data-record-id="'+trip.id+'"' : '');
+
+
             html = '<div class="trip-click trip-wrapper ' + classNames + ' trip-' + type + (trip.dirty ? ' trip-dirty ' : '') + (trip.selected ? ' trip-selected ' : '') +'" data-event-id="' + trip.id + '" style="' + styleAttr + '">' +
                         '<div class="trip-line"></div>' +
-                        (trip.icon ? '<div class="trip-icon" data-show-popover="Event" data-record-id="'+trip.id+'"><i class="transport-mode-icon ' + htmlEscape(trip.icon) + '"></i></div>' : '') +
+                        (trip.icon ? '<div class="trip-icon" ' + popoverHtmlAttr + '><i class="transport-mode-icon ' + htmlEscape(trip.icon) + '"></i></div>' : '') +
                     '</div>';
         }
 
