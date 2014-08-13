@@ -568,25 +568,25 @@ function AgendaEventRenderer() {
         trip = event.trips[type];
 
         if (trip) {
-            var classNames  = '';
-            var container   = getBodyContent();
-            var top         = timePosition(trip.start, trip.start);
-            var bottom      = timePosition(trip.start, trip.end);
-            var buffer      = 0;
-            var height      = bottom - top;
+            var classNames      = '';
+            var container       = getBodyContent();
             var positionFrom    = 'top';
-            var wrapperHeight   = 0;
 
-            if (typeof trip.timeBuffer === 'number') {
-                var startWithBuffer = cloneDate(trip.start, true);
-                startWithBuffer.setSeconds(trip.timeBuffer);
+            var top             = 0;
+            var from            = 0;
+            var height          = 0;
+            var styleAttr       = 'position:absolute;';
 
-                buffer = timePosition(cloneDate(trip.start, true), startWithBuffer);
+            if (type === 'to') {
+                top         = timePosition(trip.start, trip.start);
+                bottom      = timePosition(event.start, event.start);
+            } else {
+                top         = timePosition(event.end, event.end);
+                bottom      = timePosition(trip.end, trip.end);
             }
 
-            wrapperHeight = height + buffer;
+            height      = bottom - top;
 
-            var styleAttr = 'position:absolute;';
 
             if (type === 'from') {
                 positionFrom = 'bottom';
@@ -594,13 +594,13 @@ function AgendaEventRenderer() {
                 if ((seg.top + seg.outerHeight) >= container.height()) {
                     classNames = 'trip-outside-bottom';
                 } else {
-                    styleAttr += 'bottom: -' + wrapperHeight + 'px; height: ' + wrapperHeight + 'px;';
+                    styleAttr += 'bottom: -' + height + 'px; height: ' + height + 'px;';
                 }
             } else {
                 if (seg.top <= 0) {
                     classNames = 'trip-outside-top';
                 } else {
-                    styleAttr += 'top: -' + wrapperHeight + 'px; height: ' + wrapperHeight + 'px;';
+                    styleAttr += 'top: -' + height + 'px; height: ' + height + 'px;';
                 }
             }
 
