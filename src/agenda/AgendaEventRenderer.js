@@ -577,17 +577,29 @@ function AgendaEventRenderer() {
             var from            = 0;
             var height          = 0;
             var styleAttr       = 'position:absolute;';
+            var startOfDay      = cloneDate(event.start, true);
+            var endOfDay        = addDays(cloneDate(event.end, true), 1, true);
 
             if (type === 'to') {
-                top         = timePosition(trip.start, trip.start);
+                if (trip.start.getTime() < startOfDay) {
+                    classNames += ' trip-on-prev-day';
+                    top         = -8;
+                } else {
+                    top         = timePosition(trip.start, trip.start);
+                }
                 bottom      = timePosition(event.start, event.start);
             } else {
                 top         = timePosition(event.end, event.end);
-                bottom      = timePosition(trip.end, trip.end);
+
+                if (trip.end.getTime() > endOfDay) {
+                    classNames += ' trip-on-next-day';
+                    bottom          = -8;
+                } else {
+                    bottom      = timePosition(trip.end, trip.end);
+                }
             }
 
             height      = bottom - top;
-
 
             if (type === 'from') {
                 positionFrom = 'bottom';
@@ -659,8 +671,8 @@ function AgendaEventRenderer() {
             " style='position:absolute;z-index:8;top:" + seg.top + "px;left:" + seg.left + "px; " + mainDivSkinCss + "'" +
             ">" +
 
-            tripHtml(seg, event, 'to') +
-            tripHtml(seg, event, 'from') +
+            (seg.isStart ? tripHtml(seg, event, 'to') : '') +
+            (seg.isEnd ? tripHtml(seg, event, 'from') : '') +
 
             "<div class='fc-event-inner fc-event-skin'" + skinCssAttr + ">" +
             "<div class='fc-event-head fc-event-skin'" + skinCssAttr + ">" +
