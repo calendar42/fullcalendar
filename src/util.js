@@ -119,6 +119,11 @@ function lazySegBind(container, segs, bindHandlers) {
 	container.unbind('mouseover').mouseover(function(ev) {
 		var parent=ev.target, e,
 			i, seg;
+
+		if (parent == this) {
+			e = parent;
+		}
+
 		while (parent && parent != this) {
 			e = parent;
 			parent = parent.parentNode;

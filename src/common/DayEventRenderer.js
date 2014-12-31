@@ -237,7 +237,39 @@ function DayEventRenderer() {
 				}
 				i++;
 			}
-			rowDivs[rowI].height(arrayMax(colHeights));
+
+
+			/* 
+				Calculate the height of the allDay row.
+				
+				Currently we set the heights to be 
+					min: 34
+					max: 80
+				
+				When the height is between the limits use the calculated height but add 4px because of some borders and shadows around the events.
+			*/
+			var rowHeight = arrayMax(colHeights);
+
+			// min-height
+			if (rowHeight < 34) {
+				rowHeight = 34;
+
+			// max-height
+			} else if (rowHeight > 80) {
+				rowHeight = 80;
+			} else {
+				// Add some margin
+				rowHeight += 4;
+			}
+
+			rowDivs[rowI].height(rowHeight);
+			segmentContainer.css({
+				'height': rowHeight,
+				'width': '100%',
+				'overflow-y': 'scroll',
+			});
+
+			// rowDivs[rowI].height(arrayMax(colHeights));
 			renderOverflowLinks(overflowLinks, rowDivs[rowI]);
 		}
 		daySegSetTops(segs, getRowTops(rowDivs));

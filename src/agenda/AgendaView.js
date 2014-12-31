@@ -255,7 +255,9 @@ function AgendaView(element, calendar, viewName) {
 			allDayTable = $(s).appendTo(slotLayer);
 			allDayRow = allDayTable.find('tr');
 			
-			dayBind(allDayRow.find('td'));
+			// Since the daySegmentContainer now wraps the events because its scrollable we need to caputre the mouse events on that div
+			dayBind(daySegmentContainer);
+			// dayBind(allDayRow.find('td'));
 			
 			axisFirstCells = axisFirstCells.add(allDayTable.find('th:first'));
 			gutterCells = gutterCells.add(allDayTable.find('th.fc-agenda-gutter'));
