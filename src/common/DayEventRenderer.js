@@ -244,7 +244,7 @@ function DayEventRenderer() {
 				
 				Currently we set the heights to be 
 					min: 34
-					max: 80
+					max: 164
 				
 				When the height is between the limits use the calculated height but add 4px because of some borders and shadows around the events.
 			*/
@@ -255,7 +255,7 @@ function DayEventRenderer() {
 				rowHeight = 34;
 
 			// max-height
-			} else if (rowHeight > 80) {
+			} else if (rowHeight > 164) {
 				rowHeight = 164;
 			} else {
 				// Add some margin
