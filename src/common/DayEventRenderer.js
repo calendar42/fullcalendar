@@ -256,7 +256,7 @@ function DayEventRenderer() {
 
 			// max-height
 			} else if (rowHeight > 80) {
-				rowHeight = 80;
+				rowHeight = 164;
 			} else {
 				// Add some margin
 				rowHeight += 4;

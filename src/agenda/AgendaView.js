@@ -453,7 +453,14 @@ function AgendaView(element, calendar, viewName) {
 	function dayBind(cells) {
 		cells.click(slotClick)
             .on('dblclick', daySelectionDblClick)
-            .mousedown(daySelectionMousedown);
+            .mousedown(function (ev) {
+				var target = $(ev.target);
+
+				// If the click is on a event and not in the background skip the click.
+				if (!target.hasClass('fc-event') && target.parents('.fc-event').length <= 0) {
+					daySelectionMousedown(ev);
+				}
+            });
 	}
 
 
