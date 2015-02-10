@@ -593,7 +593,7 @@ function AgendaEventRenderer() {
 
                 if (trip.end.getTime() > endOfDay) {
                     classNames += ' trip-on-next-day';
-                    bottom          = -8;
+                    bottom      = container.height() + 8;
                 } else {
                     bottom      = timePosition(trip.end, trip.end);
                 }
@@ -605,12 +605,14 @@ function AgendaEventRenderer() {
                 positionFrom = 'bottom';
 
                 if ((seg.top + seg.outerHeight) >= container.height()) {
+                    // When the event segment is running to the bottom of the column (23:59)
                     classNames += ' trip-outside-bottom';
                 } else {
                     styleAttr += 'bottom: -' + height + 'px; height: ' + height + 'px;';
                 }
             } else {
                 if (seg.top <= 0) {
+                    // When the event segment is running to the top of the column (00:00)
                     classNames += ' trip-outside-top';
                 } else {
                     styleAttr += 'top: -' + height + 'px; height: ' + height + 'px;';
