@@ -619,8 +619,12 @@ function AgendaEventRenderer() {
 
             var popoverHtmlAttr = (showPopover === true ? 'data-show-popover="Event" data-record-id="'+trip.id+'"' : '');
 
+            var relatedEventData = '';
+            if(Arthur.isEmptyTripId(trip.id)){
+                relatedEventData = ' data-related-event-id=%@'.fmt(event.id);
+            }
 
-            html = '<div class="trip-click trip-wrapper ' + classNames + ' trip-' + type + (trip.dirty ? ' trip-dirty ' : '') + (trip.selected ? ' trip-selected ' : '') +'" data-event-id="' + trip.id + '" style="' + styleAttr + '">' +
+            html = '<div class="trip-click trip-wrapper ' + classNames + ' trip-' + type + (trip.dirty ? ' trip-dirty ' : '') + (trip.selected ? ' trip-selected ' : '') +'" data-event-id="' + trip.id + '" style="' + styleAttr + '"'+relatedEventData+'>' +
                         '<div class="trip-line"></div>' +
                         (trip.icon ? '<div class="trip-icon" ' + popoverHtmlAttr + '><i class="transport-mode-icon ' + htmlEscape(trip.icon) + '"></i></div>' : '') +
                     '</div>';
