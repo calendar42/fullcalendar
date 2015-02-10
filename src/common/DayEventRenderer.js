@@ -267,6 +267,7 @@ function DayEventRenderer() {
 				'height': rowHeight,
 				'width': '100%',
 				'overflow-y': 'scroll',
+				'overflow-x': 'hidden'
 			});
 
 			// rowDivs[rowI].height(arrayMax(colHeights));

@@ -108,14 +108,16 @@ function SelectionManager() {
     
     function daySelectionDblClick (ev) {
         if (ev.which == 1 && opt('selectable') && !$(ev.target).hasClass('fc-cell-overlay')) { // which==1 means left mouse button
-            unselect(ev);
-    		var cellDate = t.cellDate;
-    		var coordinateGrid = t.getCoordinateGrid();
-    		var newCell = coordinateGrid.cell(ev.pageX, ev.pageY);
-    		var d1 = cellDate(newCell);
-    		var d2 = cloneDate(d1);
-    		renderSelection(d1, d2, true);
-    		reportSelection(d1, d2, true, ev);
+        	if(!$(ev.target).hasClass('fc-event') && !$(ev.target).parents().hasClass('fc-event')){
+	            unselect(ev);
+	    		var cellDate = t.cellDate;
+	    		var coordinateGrid = t.getCoordinateGrid();
+	    		var newCell = coordinateGrid.cell(ev.pageX, ev.pageY);
+	    		var d1 = cellDate(newCell);
+	    		var d2 = cloneDate(d1);
+	    		renderSelection(d1, d2, true);
+	    		reportSelection(d1, d2, true, ev);
+        	}
         }
     }
 
