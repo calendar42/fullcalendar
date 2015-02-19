@@ -1,7 +1,6 @@
 
 /* Additional view: list (by bruederli@kolabsys.com)
 ---------------------------------------------------------------------------------*/
-
 function ListEventRenderer() {
 	var t = this;
 
@@ -414,7 +413,122 @@ function ListView(element, calendar) {
 		colFormat = opt('columnFormat', 'day');
 	}
 
-    function tripHtml(event, type) {
+    /**
+     * Returns the html of an element of the list
+     * @method listItemTemplate
+     * @param  {object}          event The event to print
+     * @param  {array}          times An array with all times ([0] = from, [1] = to) related to this event
+     * @return {string}                The html that prints the event
+     */
+	function listItemTemplate(event, times) {
+		var html = '';
+
+		// If there are any 'to' suggestion, we should get the html that prints it
+		html += suggestionHtml(event, 'to');
+
+		/* if it is a trip it should have a different logic process to render the html, so first check if it is a trip, and call the correct function */
+		if(event.isItineraryEvent === true){
+			html += getItineraryHtml(event,times);
+		} else {
+			html += getEventHtml(event,times);
+		}
+
+		// If there are any 'from' suggestion, we should get the html that prints it
+		html += suggestionHtml(event, 'from');
+
+		return html;
+	}
+
+	/**
+	 * Returns the html to render an Itinerary
+	 * @method getItinearyHtml
+	 * @param  {object}          itinerary The itinerary to render
+	 * @param  {array}          times An array with all times ([0] = from, [1] = to) related to this event
+	 * @return {string}                the html
+	 */
+	function getItineraryHtml(itinerary, times){
+		var html = '';
+
+		html += "<div class='fc-event-head fc-event-skin fc-itinerary-event'>" +
+				"<div class='fc-event-time muted'>" +
+					(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
+					(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
+					(itinerary.editable ? '' : '<div class="readonly-badge"><i class="icon icon-lock"></i></div>') +
+				"</div></div>";
+
+		html += "<div class='fc-event-content'>" +
+			"<div class='fc-event-title'>" +
+				htmlEscape(itinerary.title) +
+			"</div>" +
+			"<div class='fc-event-location muted'>" +
+				itinerary.timeText +
+			"</div>" +
+			"<div class='fc-event-location muted'>" +
+				itinerary.startLocationText +
+			"</div>" +
+			"<div class='fc-event-location muted'>" +
+				itinerary.endLocationText +
+			"</div>" +
+		"</div>";
+
+		// budgets related with the color of the event (so the calendar)
+		html += '<div class="event-colors">';
+		if (itinerary.colors) {
+			for (var colorIndex = 0; colorIndex < itinerary.colors.length; colorIndex++) {
+				html += '<div class="event-color" style="background-color: ' + itinerary.colors[colorIndex] + '"></div>';
+			}
+		}
+		html += '</div>';
+
+		return html;
+	}
+
+    /**
+     * Returns the html of an event
+     * @method getEventHtml
+     * @param  {object}          event The event to print
+     * @param  {array}          times An array with all times ([0] = from, [1] = to) related to this event
+     * @return {string}                The html that prints the event
+     */
+	function getEventHtml(event,times){
+		var html = '';
+
+		html += "<div class='fc-event-head fc-event-skin'>" +
+				"<div class='fc-event-time muted'>" +
+					(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
+					(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
+					(event.editable ? '' : '<div class="readonly-badge"><i class="icon icon-lock"></i></div>') +
+				"</div></div>";
+
+		html += "<div class='fc-event-content'>" +
+			"<div class='fc-event-title'>" +
+				htmlEscape(event.title) +
+			"</div>" +
+			"<div class='fc-event-location muted'>" +
+				(event.location_text ? htmlEscape(event.location_text) : '–') +
+			"</div>" +
+		"</div>";
+
+		// budgets related with the color of the event (so the calendar)
+		html += '<div class="event-colors">';
+		if (event.colors) {
+			for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
+				html += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
+			}
+		}
+		html += '</div>';
+
+		return html;
+	}
+
+	/**
+	 * Returns the html of a TRIP SUGGESTION in the list view
+	 * @method suggestionHtml
+	 * @param  {object}          event the related to/from which suggestion is related to
+	 * @param  {string}          type if the suggestion is from or to
+	 * @return {string}                The html to paste and print the suggestion in the listView
+	 */
+    function suggestionHtml(event, type) {
         var html = '';
         var trip = null;
 
@@ -425,57 +539,21 @@ function ListView(element, calendar) {
         trip = event.trips[type];
 
         if (trip) {
+        	
         	var noType = (trip.type === 'to')?_('form'):_('to');
-        	//var type = _(trip.type);
-            /* html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>" +
-                        "<div class='trip-inner'>" + htmlEscape(trip.title) + "</div>" +
-                    "</div>";*/
-            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>" +
-                        "<div class='trip-subTitle'>" + trip.subTitle + "</div>" +
-                        "<div class='modality-icon c42-icon c42-icon-medium "+trip.icon+"''></div>" +
-             			"<div class='trip-inner'>" + C42.utils.createShortReadableDurationFromMilliSeconds(trip.end - trip.start) + " " +
-                        "" +noType+" "+trip.title +"</div>" +
-                        // "" +type+" "+event.location_text +"</div>" +
+        	var fromToLineClass = (trip.type === 'to') ? 'toLine' : 'fromLine';
+
+            html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>";
+
+          	html += "<div class='modality-icon c42-icon c42-icon-medium "+trip.icon+"''></div>";
+            
+            html += "<div class='trip-inner'>" + trip.subTitle + "-" + C42.utils.createShortReadableDurationFromMilliSeconds(trip.end - trip.start) + " " +
+                        "" +noType+" "+trip.title +"</div><div class="+ fromToLineClass +"></div>" +
                     "</div>";
         }
 
         return html;
     }
-
-	function listItemTemplate(event, times) {
-		var html = '';
-
-		html += tripHtml(event, 'to');
-
-		html += "<div class='fc-event-head fc-event-skin'>" +
-					"<div class='fc-event-time muted'>" +
-						(times[0] ? '<span class="fc-col-date">' + times[0] + '</span> ' : '') +
-						(times[1] ? '<span class="fc-col-time">' + times[1] + '</span>' : '') +
-						(event.editable ? '' : '<div class="readonly-badge"><i class="icon icon-lock"></i></div>') +
-					"</div>";
-
-				html += "</div>" +
-				"<div class='fc-event-content'>" +
-					"<div class='fc-event-title'>" +
-						htmlEscape(event.title) + //(event.editable ? '' : ' ' + opt('listTexts', 'readonly')) +
-					"</div>" +
-					"<div class='fc-event-location muted'>" +
-						(event.location_text ? htmlEscape(event.location_text) : '–') +
-					"</div>" +
-				"</div>";
-				html += '<div class="event-colors">';
-				if (event.colors) {
-					for (var colorIndex = 0; colorIndex < event.colors.length; colorIndex++) {
-						html += '<div class="event-color" style="background-color: ' + event.colors[colorIndex] + '"></div>';
-					}
-				}
-				html += '</div>';
-
-		html += tripHtml(event, 'from');
-
-		return html;
-	}
-
 	function buildSkeleton() {
 		body = $('<div>').addClass('fc-list-content').appendTo(element);
 	}
