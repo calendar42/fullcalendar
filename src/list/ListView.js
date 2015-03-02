@@ -544,16 +544,16 @@ function ListView(element, calendar) {
         	var fromToLineClass = (trip.type === 'to') ? 'toLine' : 'fromLine';
 
             html = "<div class='trip-click trip-wrapper trip-" + type + (trip.dirty ? " trip-dirty " : "") + (trip.selected ? " trip-selected " : "") +"' data-event-id='" + trip.id + "'>";
-
-          	html += "<div class='modality-icon c42-icon c42-icon-medium "+trip.icon+"''></div>";
             
           	if(_u.def(trip.title)){
+            	html += '<div class="modality-icon c42-icon-medium"><i class="transport-mode-icon '+trip.icon+'"></i></div>';
 	            html += "<div class='trip-inner'>" + trip.subTitle + "-" + C42.utils.createShortReadableDurationFromMilliSeconds(trip.end - trip.start) + " " +
 	                        "" +noType+" "+trip.title +"</div><div class="+ fromToLineClass +"></div>" +
 	                    "</div>";
           	}else{
+          		html += '<div class="modality-icon c42-icon-medium trip-icon"><i class="transport-mode-icon '+trip.icon+'"></i></div>';
           		/* Because this html is used for the plus button to request a new trip, we need to add the boxes taht give to it the space, but empty */
-          		html += "<div class='trip-inner' style='width: 190px' > %@ </div></div>".fmt("Add a journey");
+          		html += "<div class='trip-inner' style='width: 190px; margin-left: 36px;' > %@ </div></div>".fmt("Add a journey");
           	}
 
         }
