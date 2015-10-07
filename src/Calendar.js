@@ -54,9 +54,10 @@ function Calendar(element, options, eventSources) {
 	var ignoreWindowResize = 0;
 	var date = new Date();
 	var events = [];
+	var eventsSimplified = [];
 	var _dragElement;
 	
-	
+	t.eventsSimplified = eventsSimplified;
 	
 	/* Main Rendering
 	-----------------------------------------------------------------------------*/
@@ -337,7 +338,6 @@ function Calendar(element, options, eventSources) {
 		rerenderEvents();
 	}
 	
-	
 	// called when a single event's data has been changed
 	function reportEventChange(eventID) {
 		rerenderEvents(eventID);
@@ -365,10 +365,12 @@ function Calendar(element, options, eventSources) {
 			currentView.clearEvents();
 			currentView.trigger('viewRender', currentView);
 			currentView.renderEvents(events, modifiedEventID);
+
+			renderEventsSimplified(eventsSimplified);
+
 			currentView.eventsDirty = false;
 		}
 	}
-	
 	
 	function markEventsDirty() {
 		$.each(viewInstances, function(i, inst) {
@@ -377,6 +379,8 @@ function Calendar(element, options, eventSources) {
 	}
 	
 	function renderEventsSimplified(events, classNames) {
+		eventsSimplified = events;
+
 	    // Not all views have this function just yet
 	    if (currentView.renderEventsSimplified) {
 	        currentView.renderEventsSimplified(events, classNames);

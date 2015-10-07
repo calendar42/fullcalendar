@@ -152,6 +152,11 @@ function AgendaEventRenderer() {
             }
         }
         
+        // clear both segments
+        getSlotSegmentContainer().find('.fc-event-simplified').remove();
+        getDaySegmentContainer().find('.fc-event-simplified').remove();
+
+        
         if (opt('allDaySlot') && dayEvents.length > 0) {
             renderDaySegsSimplified(compileDaySegs(dayEvents), classNames);
         }
@@ -302,8 +307,7 @@ function AgendaEventRenderer() {
           if (event) {
             existing = slotSegmentContainer.find('.fc-event-simplified[data-event-id="'+event.id+'"]');
             if (existing.length === 0) {
-                eventElement = $(html).css('display', 'none').appendTo(slotSegmentContainer);
-                eventElement.slideDown("fast");
+                eventElement = $(html).appendTo(slotSegmentContainer);
             } else {
                 eventElement = $(html).replaceAll(existing);
             }
