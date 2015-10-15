@@ -267,6 +267,7 @@ function AgendaEventRenderer() {
             top, bottom,
             colI, levelI, forward,
             leftmost,
+            leftoffset,
             outerWidth,
             left,
             html='',
@@ -285,6 +286,12 @@ function AgendaEventRenderer() {
             dit = 0;
         }
         
+        /*
+            In this simplified render function we determine indentation based on the color of the event
+            For that we check which colors we are rendering and create a mapping containing their specific offset
+        */
+        var color_offset_mapping = {};
+
           for (i=0; i<segCnt; i++) {
               seg = segs[i];
               event = seg.event;
@@ -295,13 +302,23 @@ function AgendaEventRenderer() {
                 seg.top = timePosition(seg.start, seg.start);
                 seg.bottom = timePosition(seg.start, seg.end);
               }
+              if (event.backgroundColor) {
+                if (color_offset_mapping[event.backgroundColor] !== undefined) {
+                    leftoffset = color_offset_mapping[event.backgroundColor];
+                } else {
+                    color_offset_mapping[event.backgroundColor] = Object.keys(color_offset_mapping).length * 6;
+                    leftoffset = color_offset_mapping[event.backgroundColor];
+                }
+              } else {
+                leftoffset = 0;
+              }
               colI = seg.col;
               levelI = seg.level;
               forward = seg.forward || 0;
               leftmost = colContentLeft(colI*dis + dit);
               seg.outerWidth = 2;
               seg.outerHeight = Math.abs(seg.bottom - seg.top);
-              seg.left = leftmost;
+              seg.left = leftmost + leftoffset;
               html += slotSegSimplifiedHtml(event, seg, classNames);
           }
           if (event) {
