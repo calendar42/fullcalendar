@@ -472,7 +472,10 @@ function AgendaView(element, calendar, viewName) {
 	
 	
 	function slotClick(ev) {
-    	if (!opt('selectable')) { // if selectable, SelectionManager will worry about dayClick
+		/*
+			We removed the following if-statement, as the selectionmanager is actually no longer triggering dayClick somehow
+		*/
+    	// if (!opt('selectable')) { // if selectable, SelectionManager will worry about dayClick
 			var col = Math.min(colCnt-1, Math.floor((ev.pageX - dayTable.offset().left - axisWidth) / colWidth));
 			var date = colDate(col);
 			var rowMatch = this.parentNode.className.match(/fc-slot(\d+)/); // TODO: maybe use data
@@ -485,7 +488,7 @@ function AgendaView(element, calendar, viewName) {
 			}else{
 				trigger('dayClick', dayBodyCells[col], date, true, ev);
 			}
-		}
+		// }
 	}
 	
 	

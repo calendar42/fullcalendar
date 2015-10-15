@@ -80,7 +80,6 @@ function SelectionManager() {
 		var cellIsAllDay = t.cellIsAllDay;
 		var hoverListener = t.getHoverListener();
 		var reportDayClick = t.reportDayClick; // this is hacky and sort of weird
-
 		if (ev.which == 1 && opt('selectable') && !$(ev.target).hasClass('fc-cell-overlay')) { // which==1 means left mouse button
 			unselect(ev);
 			var _mousedownElement = this;
